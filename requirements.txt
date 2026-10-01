@@ -1,0 +1,36 @@
+# Requirements — SignBridge
+# Core pipeline
+fastapi>=0.100.0
+uvicorn[standard]>=0.23.0
+python-multipart>=0.0.6
+httpx>=0.24.0
+
+# Audio transcription (whisper.cpp bindings)
+# Note: whisper-cli binary must be installed separately
+# See: https://github.com/ggerganov/whisper.cpp
+
+# Video processing
+ffmpeg-python>=0.2.0
+
+# LLM (for gloss translation + coverage loop)
+openai>=1.0.0  # Works with any OpenAI-compatible endpoint
+
+# Dataset processing
+pandas>=2.0.0
+openpyxl>=3.1.0
+requests>=2.31.0
+
+# Pose estimation (for Sprint 1 batch processing on GPU VPS)
+# These are heavy — install only on GPU machine:
+# mmcv-full
+# mmengine
+# mmpose
+# mmdet
+# opencv-python
+
+# Testing
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
+
+# Utils
+python-dotenv>=1.0.0

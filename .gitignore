@@ -1,0 +1,35 @@
+# dependencies
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# data (large files)
+data/raw/
+data/pose_library/
+data/videos/
+*.mov
+*.mp4
+*.wav
+*.mp3
+*.m4a
+*.ogg
+
+# env
+.env
+.env.local
+
+# os
+.DS_Store
+Thumbs.db
+
+# ide
+.vscode/
+.idea/
+
+# models
+*.pth
+*.onnx
+*.pt

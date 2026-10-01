@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SignBridge — Speech to Sign Language Video</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --bg-card: #111827;
+    --bg-elevated: #1a2234;
+    --border: #1f2937;
+    --text: #e5e7eb;
+    --text-dim: #9ca3af;
+    --text-muted: #6b7280;
+    --accent: #00d9a3;
+    --accent-dim: #00d9a322;
+    --accent-glow: #00d9a340;
+    --purple: #8b5cf6;
+    --purple-dim: #8b5cf622;
+    --orange: #f59e0b;
+    --orange-dim: #f59e0b22;
+    --blue: #3b82f6;
+    --blue-dim: #3b82f622;
+    --pink: #ec4899;
+    --pink-dim: #ec489922;
+    --red: #ef4444;
+    --green: #10b981;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    min-height: 100vh;
+    padding: 24px;
+  }
+  .container { max-width: 1200px; margin: 0 auto; }
+
+  /* Header */
+  .header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 32px; flex-wrap: wrap; gap: 16px;
+  }
+  .header-left { display: flex; align-items: center; gap: 16px; }
+  .logo {
+    width: 48px; height: 48px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; flex-shrink: 0;
+  }
+  .header h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
+  .header h1 span { color: var(--accent); }
+  .header p { color: var(--text-dim); font-size: 14px; margin-top: 2px; }
+  .status-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 16px; border-radius: 999px;
+    background: var(--bg-elevated); border: 1px solid var(--border);
+    font-size: 13px; font-weight: 500;
+  }
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--orange); box-shadow: 0 0 8px var(--orange);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  /* Cards */
+  .card {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 24px; margin-bottom: 24px;
+  }
+  .card-title {
+    font-size: 14px; font-weight: 600; color: var(--text-dim);
+    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  /* Pipeline Diagram */
+  .pipeline {
+    display: flex; align-items: stretch; gap: 0; overflow-x: auto;
+    padding-bottom: 8px;
+  }
+  .pipeline-stage {
+    flex: 1; min-width: 140px; position: relative;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 0 4px;
+  }
+  .stage-icon {
+    width: 56px; height: 56px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; margin-bottom: 12px;
+    border: 2px solid; position: relative;
+    transition: transform 0.2s;
+  }
+  .stage-icon:hover { transform: scale(1.1); }
+  .stage-name { font-size: 13px; font-weight: 600; text-align: center; margin-bottom: 4px; }
+  .stage-desc { font-size: 11px; color: var(--text-muted); text-align: center; line-height: 1.4; }
+  .stage-tech { font-size: 10px; color: var(--text-muted); margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
+
+  .stage-1 .stage-icon { border-color: var(--blue); background: var(--blue-dim); }
+  .stage-2 .stage-icon { border-color: var(--accent); background: var(--accent-dim); }
+  .stage-3 .stage-icon { border-color: var(--purple); background: var(--purple-dim); }
+  .stage-4 .stage-icon { border-color: var(--orange); background: var(--orange-dim); }
+  .stage-5 .stage-icon { border-color: var(--pink); background: var(--pink-dim); }
+  .stage-6 .stage-icon { border-color: var(--green); background: #10b98122; }
+  .stage-7 .stage-icon { border-color: var(--accent); background: var(--accent-dim); }
+
+  .pipeline-arrow {
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted); font-size: 20px;
+    padding: 20px 0; flex-shrink: 0;
+  }
+
+  /* Phase labels */
+  .phase-labels {
+    display: flex; margin-bottom: 8px; gap: 0;
+  }
+  .phase-label {
+    flex: 1; text-align: center; padding: 8px 16px;
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+    border-radius: 8px; margin: 0 4px;
+  }
+  .phase-1 { background: var(--bg-elevated); color: var(--blue); border: 1px solid var(--blue-dim); }
+  .phase-2 { background: var(--bg-elevated); color: var(--pink); border: 1px solid var(--pink-dim); }
+
+  /* Stats Grid */
+  .stats-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+  }
+  .stat {
+    background: var(--bg-elevated); border-radius: 12px; padding: 20px;
+    border: 1px solid var(--border);
+  }
+  .stat-value { font-size: 32px; font-weight: 800; letter-spacing: -1px; }
+  .stat-label { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+  .stat-accent .stat-value { color: var(--accent); }
+  .stat-purple .stat-value { color: var(--purple); }
+  .stat-orange .stat-value { color: var(--orange); }
+  .stat-blue .stat-value { color: var(--blue); }
+  .stat-pink .stat-value { color: var(--pink); }
+
+  /* Tech Stack */
+  .tech-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+  }
+  .tech-item {
+    background: var(--bg-elevated); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .tech-emoji { font-size: 28px; flex-shrink: 0; }
+  .tech-name { font-weight: 600; font-size: 14px; }
+  .tech-role { font-size: 12px; color: var(--text-dim); }
+
+  /* Sprint Progress */
+  .sprint-list { display: flex; flex-direction: column; gap: 8px; }
+  .sprint-item {
+    display: flex; align-items: center; gap: 16px;
+    padding: 14px 16px; background: var(--bg-elevated);
+    border-radius: 10px; border: 1px solid var(--border);
+  }
+  .sprint-status {
+    width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+  }
+  .sprint-done .sprint-status { background: var(--green); color: white; }
+  .sprint-active .sprint-status { background: var(--orange); color: white; }
+  .sprint-pending .sprint-status { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); }
+  .sprint-name { flex: 1; font-weight: 500; font-size: 14px; }
+  .sprint-tasks { font-size: 12px; color: var(--text-dim); }
+  .sprint-done .sprint-name { color: var(--text-dim); text-decoration: line-through; }
+  .sprint-active .sprint-name { color: var(--orange); }
+
+  /* Architecture Diagram (SVG) */
+  .arch-diagram {
+    width: 100%; overflow-x: auto;
+  }
+  .arch-diagram svg { min-width: 900px; }
+
+  /* Links */
+  .links { display: flex; flex-wrap: wrap; gap: 12px; }
+  .link {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 10px 18px; border-radius: 10px;
+    background: var(--bg-elevated); border: 1px solid var(--border);
+    color: var(--text); text-decoration: none; font-size: 14px; font-weight: 500;
+    transition: all 0.2s;
+  }
+  .link:hover { border-color: var(--accent); color: var(--accent); }
+  .link-primary { border-color: var(--accent); color: var(--accent); }
+  .link-primary:hover { background: var(--accent-dim); }
+
+  /* Dataset section */
+  .dataset-flow {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    font-size: 13px;
+  }
+  .dataset-step {
+    padding: 8px 14px; border-radius: 8px; background: var(--bg-elevated);
+    border: 1px solid var(--border); font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  }
+  .dataset-arrow { color: var(--text-muted); }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .pipeline { flex-direction: column; }
+    .pipeline-arrow { transform: rotate(90deg); padding: 4px 0; }
+    .phase-labels { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <div class="logo">🤟</div>
+      <div>
+        <h1>Sign<span>Bridge</span></h1>
+        <p>Speech → Sign Language Video Pipeline</p>
+      </div>
+    </div>
+    <div class="status-badge">
+      <div class="status-dot"></div>
+      Sprint 1 — Dataset + Pose Processing
+    </div>
+  </div>
+
+  <!-- Pipeline Diagram -->
+  <div class="card">
+    <div class="card-title">🔁 Processing Pipeline — On-Demand</div>
+    <div class="phase-labels">
+      <div class="phase-label phase-1">Phase 1: Open-Source Sign Skeleton</div>
+      <div class="phase-label phase-2" style="flex:0.6;">Phase 2: Polish</div>
+    </div>
+    <div class="pipeline">
+      <div class="pipeline-stage stage-1">
+        <div class="stage-icon">🎤</div>
+        <div class="stage-name">Audio In</div>
+        <div class="stage-desc">Voice note uploaded</div>
+        <div class="stage-tech">POST /api/jobs</div>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-stage stage-2">
+        <div class="stage-icon">📝</div>
+        <div class="stage-name">Transcribe</div>
+        <div class="stage-desc">Speech → text</div>
+        <div class="stage-tech">Whisper.cpp</div>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-stage stage-3">
+        <div class="stage-icon">✨</div>
+        <div class="stage-name">Summarize</div>
+        <div class="stage-desc">Clean ramble → script</div>
+        <div class="stage-tech">LLM</div>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-stage stage-4">
+        <div class="stage-icon">🤟</div>
+        <div class="stage-name">ASL Gloss</div>
+        <div class="stage-desc">English → ASL grammar</div>
+        <div class="stage-tech">LLM + expressions</div>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-stage stage-5">
+        <div class="stage-icon">🔄</div>
+        <div class="stage-name">Pose Lookup</div>
+        <div class="stage-desc">Stitch skeleton clips + rephrase loop</div>
+        <div class="stage-tech">RTMPose + ASLLVD + LLM</div>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-stage stage-6">
+        <div class="stage-icon">🎬</div>
+        <div class="stage-name">Polish</div>
+        <div class="stage-desc">Motion → realistic human</div>
+        <div class="stage-tech">fal.ai Dreamactor</div>
+      </div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-stage stage-7">
+        <div class="stage-icon">📤</div>
+        <div class="stage-name">Deliver</div>
+        <div class="stage-desc">Video URL returned</div>
+        <div class="stage-tech">wdfab.io</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sprint 1 Detail -->
+  <div class="card" style="border-color: var(--orange-dim);">
+    <div class="card-title" style="color: var(--orange);">🏃 Sprint 1 — Dataset + Pose Processing (In Progress)</div>
+    <div style="display: flex; flex-direction: column; gap: 10px; font-size: 13px;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="color: var(--green);">✅</span>
+        <span style="flex:1;">Download ASLLVD metadata from BU</span>
+        <span style="color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 11px;">1.5 MB Excel</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="color: var(--green);">✅</span>
+        <span style="flex:1;">Clean metadata to CSV</span>
+        <span style="color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 11px;">9,763 entries · 6 signers</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="color: var(--green);">✅</span>
+        <span style="flex:1;">Download sign videos (slim — 1 signer/gloss)</span>
+        <span style="color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 11px;">547/547 videos · 101 GB · 0 failures</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="color: var(--green);">✅</span>
+        <span style="flex:1;">Build gloss → video lookup map</span>
+        <span style="color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 11px;">2,746 glosses mapped</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="color: var(--orange);">⏳</span>
+        <span style="flex:1; color: var(--orange);">Set up MMPose/RTMPose on GPU VPS</span>
+        <span style="color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 11px;">DigitalOcean RTX 4000 Ada</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="color: var(--text-muted);">○</span>
+        <span style="flex:1; color: var(--text-dim);">Run batch pose extraction on 547 videos</span>
+        <span style="color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 11px;">~2-4 hrs GPU</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="color: var(--text-muted);">○</span>
+        <span style="flex:1; color: var(--text-dim);">Build gloss → pose video lookup table (SQLite/JSON)</span>
+        <span style="color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 11px;">pose_library/</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="color: var(--text-muted);">○</span>
+        <span style="flex:1; color: var(--text-dim);">Upload pose library to Watchtower</span>
+        <span style="color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 11px;">rsync</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Coverage Loop -->
+  <div class="card" style="border-color: var(--orange-dim);">
+    <div class="card-title" style="color: var(--orange);">🔁 Gloss Coverage Loop</div>
+    <p style="color: var(--text-dim); font-size: 14px; margin-bottom: 16px; line-height: 1.6;">
+      3,300 ASLLVD signs won't cover everything. When a gloss isn't in the database, the system doesn't just fingerspell — it <strong style="color: var(--orange);">rephrases using available vocabulary</strong> first.
+    </p>
+    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-size: 13px;">
+      <div class="dataset-step">Gloss: "PROCRASTINATE"</div>
+      <div class="dataset-arrow">→</div>
+      <div class="dataset-step" style="border-color: var(--red); color: var(--red);">❌ Not in DB</div>
+      <div class="dataset-arrow">→</div>
+      <div class="dataset-step" style="border-color: var(--orange); color: var(--orange);">LLM rephrases</div>
+      <div class="dataset-arrow">→</div>
+      <div class="dataset-step" style="border-color: var(--orange); color: var(--orange);">"DELAY PUT-OFF"</div>
+      <div class="dataset-arrow">→</div>
+      <div class="dataset-step" style="border-color: var(--green); color: var(--green);">✅ Found!</div>
+    </div>
+    <div style="display: flex; gap: 24px; margin-top: 16px; flex-wrap: wrap; font-size: 12px; color: var(--text-muted);">
+      <div>🔁 Max 3 retries per missing gloss</div>
+      <div>🔤 Fingerspell as last resort (names, proper nouns)</div>
+      <div>📖 Gap dictionary cached for future runs</div>
+      <div>📊 Coverage stats logged (hit / rephrase / fingerspell rates)</div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="card">
+    <div class="card-title">📊 Project Stats</div>
+    <div class="stats-grid">
+      <div class="stat stat-accent">
+        <div class="stat-value">2,746</div>
+        <div class="stat-label">ASL Glosses Mapped</div>
+      </div>
+      <div class="stat stat-purple">
+        <div class="stat-value">7</div>
+        <div class="stat-label">Pipeline Stages</div>
+      </div>
+      <div class="stat stat-orange">
+        <div class="stat-value">~5 min</div>
+        <div class="stat-label">Est. Processing Time (30s audio)</div>
+      </div>
+      <div class="stat stat-blue">
+        <div class="stat-value">547</div>
+        <div class="stat-label">Videos Downloaded</div>
+      </div>
+      <div class="stat stat-pink">
+        <div class="stat-value">101 GB</div>
+        <div class="stat-label">Dataset on Disk</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Architecture Diagram (SVG) -->
+  <div class="card">
+    <div class="card-title">🏗️ Architecture — Data Flow</div>
+    <div class="arch-diagram">
+      <svg viewBox="0 0 960 420" xmlns="http://www.w3.org/2000/svg" fill="none">
+        <!-- Boxes -->
+        <!-- Input -->
+        <rect x="10" y="20" width="140" height="50" rx="10" fill="#1a2234" stroke="#3b82f6" stroke-width="1.5"/>
+        <text x="80" y="42" text-anchor="middle" fill="#e5e7eb" font-family="Inter" font-size="12" font-weight="600">Audio Input</text>
+        <text x="80" y="56" text-anchor="middle" fill="#6b7280" font-family="JetBrains Mono" font-size="10">.mp3 .wav .m4a</text>
+
+        <!-- Whisper -->
+        <rect x="180" y="20" width="140" height="50" rx="10" fill="#1a2234" stroke="#00d9a3" stroke-width="1.5"/>
+        <text x="250" y="42" text-anchor="middle" fill="#e5e7eb" font-family="Inter" font-size="12" font-weight="600">Whisper.cpp</text>
+        <text x="250" y="56" text-anchor="middle" fill="#6b7280" font-family="JetBrains Mono" font-size="10">transcribe</text>
+
+        <!-- LLM -->
+        <rect x="350" y="20" width="140" height="50" rx="10" fill="#1a2234" stroke="#8b5cf6" stroke-width="1.5"/>
+        <text x="420" y="42" text-anchor="middle" fill="#e5e7eb" font-family="Inter" font-size="12" font-weight="600">LLM Translate</text>
+        <text x="420" y="56" text-anchor="middle" fill="#6b7280" font-family="JetBrains Mono" font-size="10">EN → ASL gloss</text>
+
+        <!-- Pose Lookup -->
+        <rect x="520" y="20" width="140" height="50" rx="10" fill="#1a2234" stroke="#f59e0b" stroke-width="1.5"/>
+        <text x="590" y="42" text-anchor="middle" fill="#e5e7eb" font-family="Inter" font-size="12" font-weight="600">Pose Lookup</text>
+        <text x="590" y="56" text-anchor="middle" fill="#6b7280" font-family="JetBrains Mono" font-size="10">gloss → video</text>
+
+        <!-- Arrows row 1 -->
+        <line x1="150" y1="45" x2="180" y2="45" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <line x1="320" y1="45" x2="350" y2="45" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <line x1="490" y1="45" x2="520" y2="45" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+        <!-- ASLLVD Database -->
+        <rect x="520" y="110" width="140" height="60" rx="10" fill="#0f1623" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4 4"/>
+        <text x="590" y="135" text-anchor="middle" fill="#f59e0b" font-family="Inter" font-size="12" font-weight="600">ASLLVD</text>
+        <text x="590" y="150" text-anchor="middle" fill="#6b7280" font-family="JetBrains Mono" font-size="10">3,300 signs</text>
+        <text x="590" y="162" text-anchor="middle" fill="#6b7280" font-family="JetBrains Mono" font-size="10">BU dataset</text>
+        <line x1="590" y1="70" x2="590" y2="110" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4 4" marker-end="url(#arrow-dash)"/>
+
+        <!-- RTMPose (pre-computed) -->
+        <rect x="350" y="110" width="140" height="60" rx="10" fill="#0f1623" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4 4"/>
+        <text x="420" y="135" text-anchor="middle" fill="#f59e0b" font-family="Inter" font-size="12" font-weight="600">RTMPose</text>
+        <text x="420" y="150" text-anchor="middle" fill="#6b7280" font-family="JetBrains Mono" font-size="10">pre-computed</text>
+        <text x="420" y="162" text-anchor="middle" fill="#6b7280" font-family="JetBrains Mono" font-size="10">GPU VPS (one-time)</text>
+        <line x1="520" y1="140" x2="490" y2="140" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4 4" marker-end="url(#arrow-dash)"/>
+
+        <!-- Pose Video -->
+        <rect x="520" y="210" width="140" height="50" rx="10" fill="#1a2234" stroke="#f59e0b" stroke-width="1.5"/>
+        <text x="590" y="232" text-anchor="middle" fill="#e5e7eb" font-family="Inter" font-size="12" font-weight="600">Pose Avatar Video</text>
+        <text x="590" y="246" text-anchor="middle" fill="#6b7280" font-family="JetBrains Mono" font-size="10">skeleton mp4</text>
+        <line x1="590" y1="70" x2="590" y2="210" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+        <!-- Stitch -->
+        <rect x="350" y="210" width="140" height="50" rx="10" fill="#1a2234" stroke="#f59e0b" stroke-width="1.5"/>
+        <text x="420" y="232" text-anchor="middle" fill="#e5e7eb" font-family="Inter" font-size="12" font-weight="600">Stitch (ffmpeg)</text>
+        <text x="420" y="246" text-anchor="middle" fill="#6b7280" font-family="JetBrains Mono" font-size="10">concat + transitions</text>
+        <line x1="520" y1="235" x2="490" y2="235" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+        <!-- Phase divider -->
+        <line x1="10" y1="290" x2="950" y2="290" stroke="#1f2937" stroke-width="1" stroke-dasharray="8 8"/>
+        <text x="480" y="285" text-anchor="middle" fill="#ec4899" font-family="Inter" font-size="11" font-weight="700" letter-spacing="2">PHASE 2 — POLISH</text>
+
+        <!-- Character Sheet -->
+        <rect x="180" y="310" width="140" height="50" rx="10" fill="#1a2234" stroke="#ec4899" stroke-width="1.5"/>
+        <text x="250" y="332" text-anchor="middle" fill="#e5e7eb" font-family="Inter" font-size="12" font-weight="600">Character Sheet</text>
+        <text x="250" y="346" text-anchor="middle" fill="#6b7280" font-family="JetBrains Mono" font-size="10">image URL</text>
+
+        <!-- Dreamactor -->
+        <rect x="380" y="310" width="160" height="50" rx="10" fill="#1a2234" stroke="#ec4899" stroke-width="1.5"/>
+        <text x="460" y="332" text-anchor="middle" fill="#e5e7eb" font-family="Inter" font-size="12" font-weight="600">fal.ai Dreamactor v2</text>
+        <text x="460" y="346" text-anchor="middle" fill="#6b7280" font-family="JetBrains Mono" font-size="10">image + video → video</text>
+
+        <!-- Final Video -->
+        <rect x="600" y="310" width="140" height="50" rx="10" fill="#1a2234" stroke="#10b981" stroke-width="1.5"/>
+        <text x="670" y="332" text-anchor="middle" fill="#e5e7eb" font-family="Inter" font-size="12" font-weight="600">Final Video</text>
+        <text x="670" y="346" text-anchor="middle" fill="#6b7280" font-family="JetBrains Mono" font-size="10">photorealistic mp4</text>
+
+        <!-- Deliver -->
+        <rect x="800" y="310" width="140" height="50" rx="10" fill="#1a2234" stroke="#00d9a3" stroke-width="1.5"/>
+        <text x="870" y="332" text-anchor="middle" fill="#e5e7eb" font-family="Inter" font-size="12" font-weight="600">Deliver</text>
+        <text x="870" y="346" text-anchor="middle" fill="#6b7280" font-family="JetBrains Mono" font-size="10">URL → user</text>
+
+        <!-- Arrows row 2 -->
+        <line x1="420" y1="260" x2="460" y2="310" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <line x1="320" y1="335" x2="380" y2="335" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <line x1="540" y1="335" x2="600" y2="335" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <line x1="740" y1="335" x2="800" y2="335" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+        <!-- ComfyUI (character gen) -->
+        <rect x="180" y="380" width="140" height="30" rx="8" fill="#0f1623" stroke="#ec4899" stroke-width="1" stroke-dasharray="4 4"/>
+        <text x="250" y="399" text-anchor="middle" fill="#ec4899" font-family="JetBrains Mono" font-size="10">ComfyUI (optional)</text>
+        <line x1="250" y1="360" x2="250" y2="380" stroke="#ec4899" stroke-width="1" stroke-dasharray="4 4"/>
+
+        <!-- Arrow markers -->
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+            <path d="M0,0 L8,4 L0,8 Z" fill="#4b5563"/>
+          </marker>
+          <marker id="arrow-dash" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+            <path d="M0,0 L8,4 L0,8 Z" fill="#f59e0b"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Tech Stack -->
+  <div class="card">
+    <div class="card-title">🛠️ Technology Stack</div>
+    <div class="tech-grid">
+      <div class="tech-item">
+        <div class="tech-emoji">🎙️</div>
+        <div><div class="tech-name">Whisper.cpp</div><div class="tech-role">Speech → text transcription</div></div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-emoji">🧠</div>
+        <div><div class="tech-name">LLM (any)</div><div class="tech-role">Summary + ASL gloss translation</div></div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-emoji">🦴</div>
+        <div><div class="tech-name">MMPose / RTMPose</div><div class="tech-role">Pose estimation (pre-computed)</div></div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-emoji">📚</div>
+        <div><div class="tech-name">ASLLVD</div><div class="tech-role">3,300+ ASL signs (Boston University)</div></div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-emoji">🎬</div>
+        <div><div class="tech-name">fal.ai Dreamactor v2</div><div class="tech-role">Motion transfer → photorealistic video</div></div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-emoji">🔧</div>
+        <div><div class="tech-name">ffmpeg</div><div class="tech-role">Video stitching + chunking</div></div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-emoji">🕸️</div>
+        <div><div class="tech-name">FastAPI</div><div class="tech-role">On-demand API endpoint</div></div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-emoji">🎨</div>
+        <div><div class="tech-name">Nodetool.ai</div><div class="tech-role">Node-based AI creative workspace (character sheets, video editing)</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sprint Progress -->
+  <div class="card">
+    <div class="card-title">🏃 Sprint Progress</div>
+    <div class="sprint-list">
+      <div class="sprint-item sprint-done">
+        <div class="sprint-status">✓</div>
+        <div class="sprint-name">Sprint 0 — Foundation</div>
+        <div class="sprint-tasks">Project setup, dashboard, PRD, fal key</div>
+      </div>
+      <div class="sprint-item sprint-active">
+        <div class="sprint-status">▶</div>
+        <div class="sprint-name">Sprint 1 — Dataset + Pose Processing</div>
+        <div class="sprint-tasks">3/8 done · Videos ✅ · MMPose next</div>
+      </div>
+      <div class="sprint-item sprint-pending">
+        <div class="sprint-status">3</div>
+        <div class="sprint-name">Sprint 2 — Translation Pipeline</div>
+        <div class="sprint-tasks">6 tasks · ~6 hrs</div>
+      </div>
+      <div class="sprint-item sprint-pending">
+        <div class="sprint-status">4</div>
+        <div class="sprint-name">Sprint 3 — Video Assembly</div>
+        <div class="sprint-tasks">5 tasks · ~4.5 hrs</div>
+      </div>
+      <div class="sprint-item sprint-pending">
+        <div class="sprint-status">5</div>
+        <div class="sprint-name">Sprint 4 — fal.ai Polish</div>
+        <div class="sprint-tasks">6 tasks · ~4 hrs</div>
+      </div>
+      <div class="sprint-item sprint-pending">
+        <div class="sprint-status">6</div>
+        <div class="sprint-name">Sprint 5 — API + End-to-End</div>
+        <div class="sprint-tasks">7 tasks · ~5 hrs</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dataset Flow -->
+  <div class="card">
+    <div class="card-title">📦 ASLLVD Dataset Pipeline</div>
+    <div class="dataset-flow">
+      <div class="dataset-step">bu.edu/asllrp/</div>
+      <div class="dataset-arrow">→</div>
+      <div class="dataset-step">Excel metadata</div>
+      <div class="dataset-arrow">→</div>
+      <div class="dataset-step">Clean CSV</div>
+      <div class="dataset-arrow">→</div>
+      <div class="dataset-step">Download .mov files</div>
+      <div class="dataset-arrow">→</div>
+      <div class="dataset-step">RTMPose (GPU VPS)</div>
+      <div class="dataset-arrow">→</div>
+      <div class="dataset-step">3,300 pose videos</div>
+      <div class="dataset-arrow">→</div>
+      <div class="dataset-step" style="border-color: var(--accent); color: var(--accent);">Lookup table</div>
+    </div>
+    <p style="margin-top: 16px; color: var(--text-dim); font-size: 13px;">
+      One-time GPU processing (~2-4 hrs on T4), then pose video lookup is static. On-demand pipeline only does file lookup + concat + fal.ai API call.
+    </p>
+  </div>
+
+  <!-- Links -->
+  <div class="card">
+    <div class="card-title">🔗 Project Links</div>
+    <div class="links">
+      <a class="link link-primary" href="https://github.com/aws-samples/genai-asl-avatar-generator">GenASL Repo (MIT-0)</a>
+      <a class="link" href="https://fal.ai/docs/model-api-reference/video-generation-api/bytedance-dreamactor">Dreamactor v2 API</a>
+      <a class="link" href="https://fal.ai/docs/model-api-reference/video-generation-api/bytedance-seedance-2.0-reference-to-video">Seedance 2.0 API</a>
+      <a class="link" href="https://github.com/open-mmlab/mmpose">MMPose</a>
+      <a class="link" href="https://www.bu.edu/asllrp/">ASLLRP (BU)</a>
+      <a class="link" href="/docs/prd.md">PRD</a>
+      <a class="link" href="/docs/agents/constitution.md">Constitution</a>
+      <a class="link" href="/docs/agents/implementation-plan.md">Implementation Plan</a>
+      <a class="link" href="/docs/agents/decision-log.md">Decision Log</a>
+    </div>
+  </div>
+
+  <!-- Future Work -->
+  <div class="card" style="border-color: var(--purple-dim);">
+    <div class="card-title" style="color: var(--purple);">🚀 Future Work — Post-POC</div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; font-size: 13px; color: var(--text-dim); line-height: 1.6;">
+      <div>📈 <strong>Expand vocabulary</strong> — Incorporate WLASL, Phoenix-2014T, How2Sign datasets beyond 3,300 signs</div>
+      <div>⚡ <strong>Real-time streaming</strong> — WebRTC pipeline for live translation</div>
+      <div>🌍 <strong>Multi-language</strong> — BSL, ISL, LSF, DGS support</div>
+      <div>🎭 <strong>Expression fine-tuning</strong> — LoRA on ASL facial expression data</div>
+      <div>👤 <strong>Custom signers</strong> — Upload your photo → personal signer avatar</div>
+      <div>📱 <strong>Mobile app</strong> — React Native wrapper</div>
+      <div>🏢 <strong>API product</strong> — Offer as accessibility service</div>
+      <div>🧠 <strong>Build on database</strong> — Expand sign coverage, add regional variants, gap dictionary grows smarter over time, contribute back to ASLLVD</div>
+      <div>💰 <strong>Productize & monetize</strong> — SaaS tiers (free fingerspell-only, paid photorealistic), API marketplace listing, enterprise accessibility contracts, white-label for education/healthcare, per-video pricing</div>
+    </div>
+  </div>
+
+  <div style="text-align: center; padding: 24px; color: var(--text-muted); font-size: 12px;">
+    SignBridge · <a href="https://wdfab.io" style="color: var(--text-muted);">wdfab.io</a> · Built by Chiron 🐴 · 2026
+  </div>
+
+</div>
+</body>
+</html>
