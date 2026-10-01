@@ -1,0 +1,130 @@
+{
+  "job_id": "test_llm_v2",
+  "started_at": "2026-10-01T06:44:55.792720",
+  "stages": {
+    "transcribe": {
+      "status": "skipped",
+      "data": {
+        "text": "Hello. My name is Kellen. I want to tell you about a new project. We are building a tool that translates voice into sign language video. This is important for accessibility."
+      }
+    },
+    "translate": {
+      "status": "ok",
+      "data": {
+        "summary": "HELLO. NAME ME KELLEN. NEW PROJECT, ME TELL-YOU. TOOL VOICE TRANSLATE SIGN VIDEO, WE BUILD. ACCESSIBILITY, IMPORTANT.",
+        "glosses": [
+          {
+            "gloss": "HELLO",
+            "start": 0.0,
+            "end": 2.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "NAME",
+            "start": 2.0,
+            "end": 4.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "ME",
+            "start": 4.0,
+            "end": 6.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "FINGERSPELL",
+            "text_to_spell": "KELLEN",
+            "start": 6.0,
+            "end": 9.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "NEW",
+            "start": 9.0,
+            "end": 11.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "PROJECT",
+            "start": 11.0,
+            "end": 13.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "ME",
+            "start": 13.0,
+            "end": 15.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "FINGERSPELL",
+            "text_to_spell": "TELL-YOU",
+            "start": 15.0,
+            "end": 18.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "FINGERSPELL",
+            "text_to_spell": "TOOL",
+            "start": 18.0,
+            "end": 21.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "VOICE",
+            "start": 21.0,
+            "end": 23.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "TRANSLATE",
+            "start": 23.0,
+            "end": 25.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "SIGN",
+            "start": 25.0,
+            "end": 27.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "VIDEO",
+            "start": 27.0,
+            "end": 29.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "WE",
+            "start": 29.0,
+            "end": 31.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "BUILD",
+            "start": 31.0,
+            "end": 33.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "FINGERSPELL",
+            "text_to_spell": "ACCESSIBILITY",
+            "start": 33.0,
+            "end": 36.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "IMPORTANT",
+            "start": 36.0,
+            "end": 38.0,
+            "expression": "neutral"
+          }
+        ],
+        "coverage": {
+          "direct_hit": 13,
+          "fingerspelled": 4
+        }
+      }
+    }
+  }
+}

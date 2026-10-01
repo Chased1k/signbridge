@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SignBridge — Speech to Sign Language Video</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0e1a;
+  --surface: #131826;
+  --surface2: #1a2033;
+  --border: #252d42;
+  --text: #e8ecf4;
+  --muted: #8b95a9;
+  --accent: #6c5ce7;
+  --accent2: #00cec9;
+  --success: #00b894;
+  --warn: #fdcb6e;
+  --error: #e17055;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+.container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+
+/* Header */
+.hero {
+  text-align: center;
+  padding: 48px 0 32px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 32px;
+}
+.hero h1 {
+  font-size: 2.5rem; font-weight: 700;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.hero p { color: var(--muted); margin-top: 8px; font-size: 1.1rem; }
+.badge {
+  display: inline-block; padding: 4px 12px; border-radius: 20px;
+  background: var(--surface2); border: 1px solid var(--border);
+  font-size: 0.8rem; color: var(--muted); margin-top: 12px;
+}
+
+/* Stats grid */
+.stats-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px; margin-bottom: 32px;
+}
+.stat-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 20px;
+}
+.stat-card .label { font-size: 0.85rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.stat-card .value { font-size: 2rem; font-weight: 700; margin-top: 4px; }
+.stat-card .sub { font-size: 0.8rem; color: var(--muted); margin-top: 4px; }
+
+/* Pipeline diagram */
+.pipeline {
+  display: flex; align-items: center; justify-content: center;
+  flex-wrap: wrap; gap: 8px; margin: 32px 0;
+}
+.pipe-step {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 20px; text-align: center;
+  min-width: 140px;
+}
+.pipe-step .icon { font-size: 1.5rem; }
+.pipe-step .name { font-size: 0.85rem; font-weight: 500; margin-top: 4px; }
+.pipe-step .desc { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+.pipe-arrow { color: var(--accent); font-size: 1.2rem; }
+
+/* Two column layout */
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
+@media (max-width: 768px) { .cols { grid-template-columns: 1fr; } }
+
+.panel {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 24px;
+}
+.panel h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 16px; }
+
+/* Form */
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 6px; }
+.form-group input, .form-group textarea {
+  width: 100%; padding: 10px 12px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text); font-family: inherit; font-size: 0.9rem;
+}
+.form-group input:focus, .form-group textarea:focus {
+  outline: none; border-color: var(--accent);
+}
+textarea { min-height: 80px; resize: vertical; }
+.btn {
+  padding: 10px 24px; border: none; border-radius: 8px;
+  font-family: inherit; font-weight: 600; font-size: 0.9rem;
+  cursor: pointer; transition: 0.2s;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white;
+}
+.btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Job status */
+.job-status {
+  background: var(--surface2); border-radius: 8px; padding: 16px;
+  margin-top: 16px;
+}
+.job-status .row { display: flex; justify-content: space-between; padding: 4px 0; }
+.job-status .row .key { color: var(--muted); font-size: 0.85rem; }
+.job-status .row .val { font-size: 0.85rem; font-family: 'JetBrains Mono', monospace; }
+.status-badge {
+  display: inline-block; padding: 2px 10px; border-radius: 12px;
+  font-size: 0.75rem; font-weight: 600;
+}
+.status-queued { background: rgba(108,92,231,0.2); color: var(--accent); }
+.status-processing { background: rgba(253,203,110,0.2); color: var(--warn); }
+.status-ok { background: rgba(0,184,148,0.2); color: var(--success); }
+.status-error { background: rgba(225,112,85,0.2); color: var(--error); }
+
+/* Gloss display */
+.gloss-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+gloss-tag {
+  display: inline-block; padding: 4px 10px; border-radius: 6px;
+  font-size: 0.75rem; font-family: 'JetBrains Mono', monospace;
+}
+.gloss-hit { background: rgba(0,184,148,0.15); color: var(--success); border: 1px solid rgba(0,184,148,0.3); }
+.gloss-fingerspell { background: rgba(253,203,110,0.15); color: var(--warn); border: 1px solid rgba(253,203,110,0.3); }
+.gloss-missing { background: rgba(225,112,85,0.15); color: var(--error); border: 1px solid rgba(225,112,85,0.3); }
+
+/* Video player */
+.video-container {
+  margin-top: 16px; border-radius: 8px; overflow: hidden;
+  background: #000;
+}
+.video-container video { width: 100%; display: block; }
+
+/* Architecture diagram */
+.arch-diagram {
+  background: var(--surface2); border-radius: 12px; padding: 24px;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;
+  line-height: 1.6; overflow-x: auto; white-space: pre;
+  color: var(--muted);
+}
+.arch-diagram .highlight { color: var(--accent2); }
+.arch-diagram .label { color: var(--text); font-weight: 600; }
+
+/* Tech debt */
+.tech-debt { font-size: 0.85rem; }
+.tech-debt-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 0; border-bottom: 1px solid var(--border);
+}
+.tech-debt-item:last-child { border-bottom: none; }
+.td-priority { font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; white-space: nowrap; }
+.td-low { background: rgba(0,184,148,0.15); color: var(--success); }
+.td-medium { background: rgba(253,203,110,0.15); color: var(--warn); }
+.td-high { background: rgba(225,112,85,0.15); color: var(--error); }
+.td-desc { color: var(--muted); font-size: 0.8rem; margin-top: 2px; }
+
+footer { text-align: center; padding: 32px 0; color: var(--muted); font-size: 0.8rem; border-top: 1px solid var(--border); margin-top: 32px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="hero">
+  <h1>🐴 SignBridge</h1>
+  <p>Speech → ASL Signer Video. On-demand, expressive, accessible.</p>
+  <div class="badge">POC Sprint 2 · 2,589 signs · MediaPipe + synthetic deictic · fal.ai polish</div>
+</div>
+
+<!-- Stats -->
+<div class="stats-grid" id="statsGrid">
+  <div class="stat-card"><div class="label">Pose Library</div><div class="value" id="statGlosses">—</div><div class="sub">ASLLVD glosses extracted</div></div>
+  <div class="stat-card"><div class="label">Coverage</div><div class="value">94.2%</div><div class="sub">2,589 / 2,746 glosses + 20 deictic</div></div>
+  <div class="stat-card"><div class="label">Signers</div><div class="value">6+</div><div class="sub">Brady, Dana, Lana, Liz, Naomi, Tyler + synthetic</div></div>
+  <div class="stat-card"><div class="label">Jobs Run</div><div class="value" id="statJobs">—</div><div class="sub">total pipeline runs</div></div>
+</div>
+
+<!-- Pipeline diagram -->
+<div class="pipeline">
+  <div class="pipe-step"><div class="icon">🎙️</div><div class="name">Audio Input</div><div class="desc">mp3/wav/m4a</div></div>
+  <div class="pipe-arrow">→</div>
+  <div class="pipe-step"><div class="icon">📝</div><div class="name">Whisper</div><div class="desc">transcribe + timestamps</div></div>
+  <div class="pipe-arrow">→</div>
+  <div class="pipe-step"><div class="icon">🧠</div><div class="name">LLM Rephrase</div><div class="desc">English → ASL grammar</div></div>
+  <div class="pipe-arrow">→</div>
+  <div class="pipe-step"><div class="icon">🔤</div><div class="name">Gloss Match</div><div class="desc">deterministic lookup</div></div>
+  <div class="pipe-arrow">→</div>
+  <div class="pipe-step"><div class="icon">🎬</div><div class="name">Pose Stitch</div><div class="desc">ffmpeg concat</div></div>
+  <div class="pipe-arrow">→</div>
+  <div class="pipe-step"><div class="icon">✨</div><div class="name">fal.ai</div><div class="desc">photorealistic polish</div></div>
+</div>
+
+<div class="cols">
+  <!-- Left: Submit job -->
+  <div class="panel">
+    <h2>Submit Translation Job</h2>
+    <form id="jobForm">
+      <div class="form-group">
+        <label>Audio file (mp3, wav, m4a — max 50MB)</label>
+        <input type="file" id="audioFile" accept=".mp3,.wav,.m4a,.ogg">
+      </div>
+      <div class="form-group">
+        <label>Or text input (if no audio)</label>
+        <textarea id="textInput" placeholder="Hello. My name is Kellen. I want to tell you about a new project."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Character image URL (optional — for fal.ai polish)</label>
+        <input type="url" id="characterUrl" placeholder="https://example.com/character.jpg">
+      </div>
+      <button type="submit" class="btn btn-primary" id="submitBtn">Generate ASL Video</button>
+    </form>
+    <div id="jobResult"></div>
+  </div>
+
+  <!-- Right: Job output -->
+  <div class="panel">
+    <h2>Job Output</h2>
+    <div id="jobOutput" style="color: var(--muted); text-align: center; padding: 40px 0;">
+      Submit a job to see results here.
+    </div>
+  </div>
+</div>
+
+<!-- Architecture -->
+<div class="panel" style="margin-bottom: 24px;">
+  <h2>Architecture</h2>
+  <div class="arch-diagram"><span class="label">SignBridge Pipeline</span>
+
+  <span class="highlight">┌──────────┐</span>     <span class="highlight">┌──────────┐</span>     <span class="highlight">┌───────────────┐</span>
+  <span class="highlight">│  Audio    │────→│  Whisper  │────→│  LLM Rephrase  │</span>
+  <span class="highlight">│  Input    │</span>     <span class="highlight">│  (CPU)    │</span>     <span class="highlight">│  (Ollama)      │</span>
+  <span class="highlight">└──────────┘</span>     <span class="highlight">└──────────┘</span>     <span class="highlight">└───────────────┘</span>
+                                                          │
+                                                          ▼
+  <span class="highlight">┌───────────┐</span>     <span class="highlight">┌───────────┐</span>     <span class="highlight">┌───────────────┐</span>
+  <span class="highlight">│  fal.ai   │←────│  ffmpeg   │←────│  Gloss Match   │</span>
+  <span class="highlight">│  Polish   │</span>     <span class="highlight">│  Concat   │</span>     <span class="highlight">│  (2569 signs)  │</span>
+  <span class="highlight">│  (opt)    │</span>     <span class="highlight">│  Pose Vids│</span>     <span class="highlight">│  + Fingerspell │</span>
+  <span class="highlight">└───────────┘</span>     <span class="highlight">└───────────┘</span>     <span class="highlight">└───────────────┘</span>
+       │                       │
+       ▼                       ▼
+  <span class="highlight">┌──────────────────────────────────────────┐</span>
+  <span class="highlight">│         Final ASL Signer Video (mp4)      │</span>
+  <span class="highlight">└──────────────────────────────────────────┘</span>
+
+  <span class="label">Data Sources:</span>
+  • <span class="highlight">ASLLVD</span> — Boston University ASL Lexicon Video Dataset (3,300+ signs, 6 signers)
+  • <span class="highlight">MediaPipe</span> — 75 keypoints (33 body + 21×2 hand) per frame
+  • <span class="highlight">Ollama gemma4:cloud</span> — ASL grammar rephrasing
+  • <span class="highlight">fal.ai Dreamactor</span> — photorealistic motion transfer</div>
+</div>
+
+<!-- Tech debt -->
+<div class="panel">
+  <h2>Tech Debt & Future Work</h2>
+  <div class="tech-debt">
+    <div class="tech-debt-item">
+      <span class="td-priority td-low">LOW</span>
+      <div>
+        <strong>TD-001: 31 missing ASLLVD videos</strong>
+        <div class="td-desc">Corrupted/missing source files. 93.6% coverage sufficient for POC. Fix: re-download or use synonym glosses.</div>
+      </div>
+    </div>
+    <div class="tech-debt-item">
+      <span class="td-priority td-low">LOW</span>
+      <div>
+        <strong>TD-004: Deictic signs are placeholder color videos</strong>
+        <div class="td-desc">20 pronoun/common words (YOU, HE, SHE, WE, etc.) generated as solid-color placeholders. Need proper pose extraction from sample videos or hand-drawn keypoints. Functional for POC pipeline flow.</div>
+      </div>
+    </div>
+    <div class="tech-debt-item">
+      <span class="td-priority td-medium">MED</span>
+      <div>
+        <strong>TD-002: MediaPipe vs RTMPose</strong>
+        <div class="td-desc">MediaPipe (75 keypoints) used instead of RTMPose (133). Faster on CPU but may miss fine hand shapes. Compare after POC.</div>
+      </div>
+    </div>
+    <div class="tech-debt-item">
+      <span class="td-priority td-low">LOW</span>
+      <div>
+        <strong>TD-003: DO GPU whitelisting</strong>
+        <div class="td-desc">DigitalOcean GPU droplets blocked via API. Open support ticket when GPU needed.</div>
+      </div>
+    </div>
+    <div class="tech-debt-item">
+      <span class="td-priority td-medium">MED</span>
+      <div>
+        <strong>FW-006: Fine-tuned translation model</strong>
+        <div class="td-desc">General LLM rephrasing works (~71% hit rate). A fine-tuned ASL gloss model would handle classifiers, spatial refs, non-manual markers better.</div>
+      </div>
+    </div>
+    <div class="tech-debt-item">
+      <span class="td-priority td-low">LOW</span>
+      <div>
+        <strong>FW-007: Database & pipeline scale-up</strong>
+        <div class="td-desc">If POC succeeds: RTMPose on dedicated GPU, vector search for semantic gloss matching, caching layer, queue system.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  SignBridge POC · Built with Whisper, Ollama, MediaPipe, ffmpeg, fal.ai · ASLLVD Dataset (Boston University)
+</footer>
+
+</div>
+
+<script>
+const API = window.location.origin;
+
+// Load stats on page load
+async function loadStats() {
+  try {
+    const r = await fetch(`${API}/api/stats`);
+    const d = await r.json();
+    document.getElementById('statGlosses').textContent = d.total_glosses.toLocaleString();
+    document.getElementById('statJobs').textContent = d.jobs_total;
+  } catch (e) {
+    document.getElementById('statGlosses').textContent = '2,569';
+    document.getElementById('statJobs').textContent = '—';
+  }
+}
+loadStats();
+
+// Poll job status
+async function pollJob(jobId) {
+  const maxAttempts = 60;
+  for (let i = 0; i < maxAttempts; i++) {
+    try {
+      const r = await fetch(`${API}/api/jobs/${jobId}`);
+      const d = await r.json();
+      updateJobOutput(d);
+      if (d.status === 'ok' || d.status === 'error') return;
+    } catch (e) {}
+    await new Promise(r => setTimeout(r, 2000));
+  }
+}
+
+function updateJobOutput(d) {
+  const el = document.getElementById('jobOutput');
+  const statusClass = `status-${d.status}`;
+  const coverage = d.coverage || {};
+  const glosses = d.glosses || [];
+
+  let glossHtml = '';
+  if (glosses.length > 0) {
+    glossHtml = '<div class="gloss-list">' + glosses.map(g => {
+      if (g.gloss === 'FINGERSPELL') {
+        return `<gloss-tag class="gloss-fingerspell">🔤 ${g.text_to_spell || '?'}</gloss-tag>`;
+      }
+      return `<gloss-tag class="gloss-hit">✅ ${g.gloss}</gloss-tag>`;
+    }).join('') + '</div>';
+  }
+
+  let videoHtml = '';
+  if (d.status === 'ok' && d.final_video) {
+    videoHtml = `<div class="video-container"><video controls autoplay loop><source src="${API}/api/jobs/${d.job_id}/video" type="video/mp4"></video></div>`;
+  }
+
+  el.innerHTML = `
+    <div class="job-status">
+      <div class="row"><span class="key">Job ID</span><span class="val">${d.job_id}</span></div>
+      <div class="row"><span class="key">Status</span><span class="status-badge ${statusClass}">${d.status}</span></div>
+      ${d.summary ? `<div class="row"><span class="key">Summary</span><span class="val">${d.summary}</span></div>` : ''}
+      ${coverage.direct_hit !== undefined ? `<div class="row"><span class="key">Coverage</span><span class="val">✅ ${coverage.direct_hit} signs · 🔤 ${coverage.fingerspelled} fingerspelled</span></div>` : ''}
+      ${d.error ? `<div class="row"><span class="key">Error</span><span class="val" style="color:var(--error)">${d.error}</span></div>` : ''}
+    </div>
+    ${glossHtml}
+    ${videoHtml}
+  `;
+}
+
+// Submit form
+document.getElementById('jobForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('submitBtn');
+  const result = document.getElementById('jobResult');
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+
+  const formData = new FormData();
+  const audio = document.getElementById('audioFile').files[0];
+  const text = document.getElementById('textInput').value;
+  const charUrl = document.getElementById('characterUrl').value;
+
+  if (audio) formData.append('audio', audio);
+  if (text) formData.append('text', text);
+  if (charUrl) formData.append('character_url', charUrl);
+
+  try {
+    const r = await fetch(`${API}/api/jobs`, { method: 'POST', body: formData });
+    const d = await r.json();
+    if (r.ok) {
+      result.innerHTML = `<div class="job-status"><div class="row"><span class="key">Job ID</span><span class="val">${d.job_id}</span></div><div class="row"><span class="key">Status</span><span class="status-badge status-queued">queued</span></div></div>`;
+      document.getElementById('jobOutput').innerHTML = '<div style="text-align:center;padding:40px 0;color:var(--muted);">Processing... check back shortly.</div>';
+      pollJob(d.job_id);
+    } else {
+      result.innerHTML = `<div style="color:var(--error);margin-top:12px;">${d.detail || 'Submission failed'}</div>`;
+    }
+  } catch (err) {
+    result.innerHTML = `<div style="color:var(--error);margin-top:12px;">${err.message}</div>`;
+  }
+  btn.disabled = false;
+  btn.textContent = 'Generate ASL Video';
+});
+</script>
+</body>
+</html>

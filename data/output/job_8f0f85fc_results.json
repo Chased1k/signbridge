@@ -1,0 +1,129 @@
+{
+  "job_id": "job_8f0f85fc",
+  "started_at": "2026-10-01T06:40:43.085399",
+  "stages": {
+    "transcribe": {
+      "status": "skipped",
+      "data": {
+        "text": "Hello. My name is Kellen. I want to tell you about a new project. We are building a tool that translates voice into sign language video."
+      }
+    },
+    "translate": {
+      "status": "ok",
+      "data": {
+        "summary": "HELLO. NAME ME KELLEN. NEW PROJECT, ME TELL-YOU. TOOL VOICE TRANSLATE SIGN VIDEO, WE BUILD.",
+        "glosses": [
+          {
+            "gloss": "HELLO",
+            "start": 0.0,
+            "end": 2.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "NAME",
+            "start": 2.0,
+            "end": 4.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "I",
+            "start": 4.0,
+            "end": 6.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "FINGERSPELL",
+            "text_to_spell": "KELLEN",
+            "start": 6.0,
+            "end": 9.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "NEW",
+            "start": 9.0,
+            "end": 11.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "PROJECT",
+            "start": 11.0,
+            "end": 13.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "I",
+            "start": 13.0,
+            "end": 15.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "FINGERSPELL",
+            "text_to_spell": "TELL-YOU",
+            "start": 15.0,
+            "end": 18.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "FINGERSPELL",
+            "text_to_spell": "TOOL",
+            "start": 18.0,
+            "end": 21.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "VOICE",
+            "start": 21.0,
+            "end": 23.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "TRANSLATE",
+            "start": 23.0,
+            "end": 25.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "SIGN",
+            "start": 25.0,
+            "end": 27.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "FINGERSPELL",
+            "text_to_spell": "VIDEO",
+            "start": 27.0,
+            "end": 30.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "GROUP",
+            "start": 30.0,
+            "end": 32.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "BUILD",
+            "start": 32.0,
+            "end": 34.0,
+            "expression": "neutral"
+          }
+        ],
+        "coverage": {
+          "direct_hit": 11,
+          "fingerspelled": 4
+        }
+      }
+    },
+    "assemble": {
+      "status": "ok",
+      "message": "11 segments, 4 missing"
+    },
+    "polish": {
+      "status": "skipped",
+      "message": "no character url"
+    }
+  },
+  "final_video": "/Users/watchtower/projects/signbridge/data/output/job_8f0f85fc_pose.mp4",
+  "status": "ok",
+  "completed_at": "2026-10-01T06:40:43.854683"
+}

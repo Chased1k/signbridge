@@ -1,0 +1,218 @@
+{
+  "job_id": "job_1790861316",
+  "started_at": "2026-10-01T06:28:36.644758",
+  "stages": {
+    "transcribe": {
+      "status": "skipped",
+      "data": {
+        "text": "Hello. My name is Kellen. I want to tell you about a new project. We are building a tool that translates voice into sign language video. This is important for accessibility.",
+        "segments": [],
+        "language": "en",
+        "duration": 0
+      }
+    },
+    "translate": {
+      "status": "ok",
+      "data": {
+        "summary": "Hello. My name is Kellen. I want to tell you about a new project. We are building a tool that translates voice into sign language video. This is important for accessibility.",
+        "glosses": [
+          {
+            "gloss": "HELLO",
+            "start": 0.0,
+            "end": 2.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "FINGERSPELL",
+            "text_to_spell": "MY",
+            "start": 2.0,
+            "end": 5.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "NAME",
+            "start": 5.0,
+            "end": 7.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "FINGERSPELL",
+            "text_to_spell": "BE",
+            "start": 7.0,
+            "end": 10.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "FINGERSPELL",
+            "text_to_spell": "KELLEN",
+            "start": 10.0,
+            "end": 13.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "I",
+            "start": 13.0,
+            "end": 15.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "WANT",
+            "start": 15.0,
+            "end": 17.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "FINGERSPELL",
+            "text_to_spell": "TO",
+            "start": 17.0,
+            "end": 20.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "FINGERSPELL",
+            "text_to_spell": "TELL",
+            "start": 20.0,
+            "end": 23.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "FINGERSPELL",
+            "text_to_spell": "YOU",
+            "start": 23.0,
+            "end": 26.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "ABOUT",
+            "start": 26.0,
+            "end": 28.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "NEW",
+            "start": 28.0,
+            "end": 30.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "PROJECT",
+            "start": 30.0,
+            "end": 32.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "FINGERSPELL",
+            "text_to_spell": "WE",
+            "start": 32.0,
+            "end": 35.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "FINGERSPELL",
+            "text_to_spell": "BE",
+            "start": 35.0,
+            "end": 38.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "BUILDING",
+            "start": 38.0,
+            "end": 40.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "FINGERSPELL",
+            "text_to_spell": "TOOL",
+            "start": 40.0,
+            "end": 43.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "THAT",
+            "start": 43.0,
+            "end": 45.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "FINGERSPELL",
+            "text_to_spell": "TRANSLATES",
+            "start": 45.0,
+            "end": 48.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "VOICE",
+            "start": 48.0,
+            "end": 50.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "FINGERSPELL",
+            "text_to_spell": "INTO",
+            "start": 50.0,
+            "end": 53.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "SIGN",
+            "start": 53.0,
+            "end": 55.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "LANGUAGE",
+            "start": 55.0,
+            "end": 57.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "FINGERSPELL",
+            "text_to_spell": "VIDEO",
+            "start": 57.0,
+            "end": 60.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "FINGERSPELL",
+            "text_to_spell": "THIS",
+            "start": 60.0,
+            "end": 63.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "FINGERSPELL",
+            "text_to_spell": "BE",
+            "start": 63.0,
+            "end": 66.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "IMPORTANT",
+            "start": 66.0,
+            "end": 68.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "FOR",
+            "start": 68.0,
+            "end": 70.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "FINGERSPELL",
+            "text_to_spell": "ACCESSIBILITY",
+            "start": 70.0,
+            "end": 73.0,
+            "expression": "neutral"
+          }
+        ],
+        "coverage": {
+          "direct_hit": 29,
+          "rephrased": 0,
+          "fingerspelled": 0,
+          "missing": 0
+        }
+      }
+    }
+  }
+}
