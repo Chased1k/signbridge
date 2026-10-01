@@ -176,7 +176,7 @@ footer { text-align: center; padding: 32px 0; color: var(--muted); font-size: 0.
 <div class="hero">
   <h1>🐴 SignBridge</h1>
   <p>Speech → ASL Signer Video. On-demand, expressive, accessible.</p>
-  <div class="badge">POC Sprint 3 · 2,589 signs · Whisper + MediaPipe + synthetic deictic · Jev-ready post-POC</div>
+  <div class="badge">POC Sprint 4 · 2,589 signs · Whisper + MediaPipe + synthetic deictic · fal.ai Dreamactor LIVE · Jev-ready post-POC</div>
 </div>
 
 <!-- Stats -->
@@ -315,6 +315,156 @@ footer { text-align: center; padding: 32px 0; color: var(--muted); font-size: 0.
       <div style="margin-top: 8px; font-size: 0.75rem; color: var(--muted); text-align: center;">
         5 pose segments · 938KB · 3.3s total pipeline (1.5s Whisper + 0.1s LLM + 1.7s assemble)
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Sprint 4 Demo — Dreamactor Polished Video -->
+<div class="panel" style="margin-bottom: 24px;">
+  <h2>✨ Sprint 4 Demo — Dreamactor v2 Photorealistic Polish</h2>
+  <p style="color: var(--muted); font-size: 0.85rem; margin-bottom: 16px;">Skeleton pose video (Sprint 3 output) → fal.ai Dreamactor v2 → photorealistic Fabio signing. First successful end-to-end polished video.</p>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 16px;">
+    <div>
+      <strong style="color: var(--accent2);">Input: Skeleton Pose Video</strong>
+      <div style="margin-top: 8px; font-size: 0.85rem; color: var(--muted); line-height: 1.6;">
+        Sprint 3 output — 5 pose segments concatenated via ffmpeg.<br>
+        MediaPipe keypoints rendered on white background.<br>
+        694×1242px, 4.4s, 110 frames.
+      </div>
+      <div class="video-container" style="margin-top: 12px;">
+        <video controls loop muted style="width: 100%; display: block;">
+          <source src="/dashboard/sprint3_test.mp4" type="video/mp4">
+        </video>
+      </div>
+      <div style="margin-top: 6px; font-size: 0.75rem; color: var(--muted); text-align: center;">Original skeleton pose video</div>
+    </div>
+    <div>
+      <strong style="color: var(--accent2);">Output: Dreamactor v2 Polished</strong>
+      <div style="margin-top: 8px; font-size: 0.85rem; color: var(--muted); line-height: 1.6;">
+        Fabio character sheet → animated by skeleton motion.<br>
+        fal.ai Dreamactor v2 (ByteDance). $0.05/sec.<br>
+        694×1242px, 4.4s, 625KB.
+      </div>
+      <div class="video-container" style="margin-top: 12px;">
+        <video controls loop autoplay muted style="width: 100%; display: block;">
+          <source src="/dashboard/sprint4_polished.mp4" type="video/mp4">
+        </video>
+      </div>
+      <div style="margin-top: 6px; font-size: 0.75rem; color: var(--muted); text-align: center;">Dreamactor v2 polished video</div>
+    </div>
+  </div>
+  <div style="margin-top: 16px; padding: 12px 16px; background: var(--surface2); border-radius: 8px; border: 1px solid var(--border); font-size: 0.85rem;">
+    <strong style="color: var(--accent2);">Pipeline:</strong> fal_client.upload_file() → fal_client.submit('fal-ai/bytedance/dreamactor/v2') → handler.get() → download<br>
+    <strong style="color: var(--success);">Status:</strong> <span style="color: var(--success);">✅ Working</span> — first successful polished video generated Oct 1, 4:29 PM MST<br>
+    <strong style="color: var(--warn);">Note:</strong> <span style="color: var(--warn);">fal.ai queue can be slow (50+ min during peak). Off-peak runs complete in 2-5 min.</span>
+  </div>
+</div>
+
+<!-- Character Sheet -->
+<div class="panel" style="margin-bottom: 24px;">
+  <h2>🎭 Fabio Character Reference Sheet</h2>
+  <p style="color: var(--muted); font-size: 0.85rem; margin-bottom: 16px;">Photorealistic character sheet for fal.ai Dreamactor video generation. Generated via 3-stage pipeline: FLUX Pro (photorealize) → Ideogram Character (multi-angle) → FLUX Pro (final polish).</p>
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 16px;">
+    <div style="text-align: center;">
+      <img src="/dashboard/fabio_front.png" style="width: 100%; border-radius: 8px; border: 1px solid var(--border);" alt="Front view">
+      <div style="font-size: 0.8rem; color: var(--muted); margin-top: 6px;">Full Body — Front</div>
+    </div>
+    <div style="text-align: center;">
+      <img src="/dashboard/fabio_side.png" style="width: 100%; border-radius: 8px; border: 1px solid var(--border);" alt="Side view">
+      <div style="font-size: 0.8rem; color: var(--muted); margin-top: 6px;">Full Body — Side Profile</div>
+    </div>
+    <div style="text-align: center;">
+      <img src="/dashboard/fabio_back.png" style="width: 100%; border-radius: 8px; border: 1px solid var(--border);" alt="Back view">
+      <div style="font-size: 0.8rem; color: var(--muted); margin-top: 6px;">Full Body — Back</div>
+    </div>
+    <div style="text-align: center;">
+      <img src="/dashboard/fabio_three_quarter.png" style="width: 100%; border-radius: 8px; border: 1px solid var(--border);" alt="Three-quarter view">
+      <div style="font-size: 0.8rem; color: var(--muted); margin-top: 6px;">Full Body — Three-Quarter</div>
+    </div>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 16px;">
+    <div style="text-align: center;">
+      <img src="/dashboard/fabio_head_neutral.png" style="width: 100%; border-radius: 8px; border: 1px solid var(--border);" alt="Neutral headshot">
+      <div style="font-size: 0.8rem; color: var(--muted); margin-top: 6px;">Headshot — Neutral</div>
+    </div>
+    <div style="text-align: center;">
+      <img src="/dashboard/fabio_head_smiling.png" style="width: 100%; border-radius: 8px; border: 1px solid var(--border);" alt="Smiling headshot">
+      <div style="font-size: 0.8rem; color: var(--muted); margin-top: 6px;">Headshot — Smiling</div>
+    </div>
+    <div style="text-align: center;">
+      <img src="/dashboard/fabio_head_serious.png" style="width: 100%; border-radius: 8px; border: 1px solid var(--border);" alt="Serious headshot">
+      <div style="font-size: 0.8rem; color: var(--muted); margin-top: 6px;">Headshot — Serious</div>
+    </div>
+  </div>
+  <div style="text-align: center; margin-top: 16px;">
+    <div style="display: inline-block; padding: 8px 16px; background: var(--surface2); border-radius: 8px; border: 1px solid var(--border); font-size: 0.85rem;">
+      <strong style="color: var(--accent2);">Quality Review:</strong>
+      Photorealism 8/10 · Angles 10/10 · Identity Consistency 9/10 · Hand Detail 7/10 (improved with hand refs)
+    </div>
+  </div>
+  <div id="handRefs" style="margin-top: 24px;">
+    <h3 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 12px;">✋ Hand Reference Shots <span style="color: var(--success); font-size: 0.75rem;">(9 handshapes generated)</span></h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;">
+      <div style="text-align: center;"><img src="/dashboard/fabio_hands_open_palm_front.png" style="width: 100%; border-radius: 8px; border: 1px solid var(--border);" alt="Open palm front"><div style="font-size: 0.75rem; color: var(--muted); margin-top: 4px;">Open Palm (front)</div></div>
+      <div style="text-align: center;"><img src="/dashboard/fabio_hands_open_palm_back.png" style="width: 100%; border-radius: 8px; border: 1px solid var(--border);" alt="Open palm back"><div style="font-size: 0.75rem; color: var(--muted); margin-top: 4px;">Open Palm (back)</div></div>
+      <div style="text-align: center;"><img src="/dashboard/fabio_hands_fist.png" style="width: 100%; border-radius: 8px; border: 1px solid var(--border);" alt="Fist"><div style="font-size: 0.75rem; color: var(--muted); margin-top: 4px;">Fist</div></div>
+      <div style="text-align: center;"><img src="/dashboard/fabio_hands_flat.png" style="width: 100%; border-radius: 8px; border: 1px solid var(--border);" alt="Flat/B handshape"><div style="font-size: 0.75rem; color: var(--muted); margin-top: 4px;">Flat / B handshape</div></div>
+      <div style="text-align: center;"><img src="/dashboard/fabio_hands_index_point.png" style="width: 100%; border-radius: 8px; border: 1px solid var(--border);" alt="Index point"><div style="font-size: 0.75rem; color: var(--muted); margin-top: 4px;">Index Point</div></div>
+      <div style="text-align: center;"><img src="/dashboard/fabio_hands_thumb_up.png" style="width: 100%; border-radius: 8px; border: 1px solid var(--border);" alt="Thumb up"><div style="font-size: 0.75rem; color: var(--muted); margin-top: 4px;">Thumb Up</div></div>
+      <div style="text-align: center;"><img src="/dashboard/fabio_hands_v_peace.png" style="width: 100%; border-radius: 8px; border: 1px solid var(--border);" alt="V/peace handshape"><div style="font-size: 0.75rem; color: var(--muted); margin-top: 4px;">V / Peace handshape</div></div>
+      <div style="text-align: center;"><img src="/dashboard/fabio_hands_c_shape.png" style="width: 100%; border-radius: 8px; border: 1px solid var(--border);" alt="C handshape"><div style="font-size: 0.75rem; color: var(--muted); margin-top: 4px;">C handshape</div></div>
+      <div style="text-align: center;"><img src="/dashboard/fabio_hands_both_open.png" style="width: 100%; border-radius: 8px; border: 1px solid var(--border);" alt="Both palms up"><div style="font-size: 0.75rem; color: var(--muted); margin-top: 4px;">Both Palms Up</div></div>
+    </div>
+    <div style="text-align: center; margin-top: 16px;">
+      <img src="/dashboard/fabio_hand_reference_sheet.png" style="max-width: 100%; border-radius: 12px; border: 1px solid var(--border);" alt="Hand reference composite sheet">
+      <div style="font-size: 0.8rem; color: var(--muted); margin-top: 6px;">Composite hand reference sheet (3×3 grid)</div>
+    </div>
+  </div>
+</div>
+
+<!-- Sprint 4 Roadmap -->
+<div class="panel" style="margin-bottom: 24px;">
+  <h2>🚀 Sprint 4 Roadmap — fal.ai Integration</h2>
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 16px;">
+    <div style="background: var(--surface2); border-radius: 10px; padding: 20px; border: 1px solid var(--border);">
+      <div style="font-size: 1.2rem; margin-bottom: 8px;">📋</div>
+      <strong>Phase 1: Dreamactor Test</strong>
+      <ul style="margin-top: 8px; padding-left: 20px; font-size: 0.85rem; color: var(--muted); line-height: 1.8;">
+        <li>Upload Fabio character sheet to fal.ai</li>
+        <li>Test Dreamactor v2 with a single pose video</li>
+        <li>Compare skeleton → photorealistic output</li>
+        <li>Evaluate hand fidelity in output</li>
+      </ul>
+    </div>
+    <div style="background: var(--surface2); border-radius: 10px; padding: 20px; border: 1px solid var(--border);">
+      <div style="font-size: 1.2rem; margin-bottom: 8px;">🔧</div>
+      <strong>Phase 2: Pipeline Integration</strong>
+      <ul style="margin-top: 8px; padding-left: 20px; font-size: 0.85rem; color: var(--muted); line-height: 1.8;">
+        <li>Add fal.ai step to pipeline.py after ffmpeg concat</li>
+        <li>Character sheet → reference image input</li>
+        <li>Batch process segments or full video</li>
+        <li>Quality vs speed tradeoff analysis</li>
+      </ul>
+    </div>
+    <div style="background: var(--surface2); border-radius: 10px; padding: 20px; border: 1px solid var(--border);">
+      <div style="font-size: 1.2rem; margin-bottom: 8px;">📊</div>
+      <strong>Phase 3: Quality Assessment</strong>
+      <ul style="margin-top: 8px; padding-left: 20px; font-size: 0.85rem; color: var(--muted); line-height: 1.8;">
+        <li>Compare POC output to commercial ASL products</li>
+        <li>Evaluate ASLLVD pose quality (is upgrade needed?)</li>
+        <li>Test YouTube-sourced pose extraction (FW-009)</li>
+        <li>Hand/finger mapping engine evaluation (FW-008)</li>
+      </ul>
+    </div>
+    <div style="background: var(--surface2); border-radius: 10px; padding: 20px; border: 1px solid var(--border);">
+      <div style="font-size: 1.2rem; margin-bottom: 8px;">🧪</div>
+      <strong>Phase 4: Jev/KEV Integration</strong>
+      <ul style="margin-top: 8px; padding-left: 20px; font-size: 0.85rem; color: var(--muted); line-height: 1.8;">
+        <li>Constrained decoding for exact gloss matching</li>
+        <li>Replace LLM+deterministic two-pass with Jev</li>
+        <li>OpenRouter API integration</li>
+        <li>Fine-tuned model path (FW-006)</li>
+      </ul>
     </div>
   </div>
 </div>

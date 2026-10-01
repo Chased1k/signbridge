@@ -215,8 +215,27 @@ def assemble_pose_video(glosses, output_path):
 # STAGE 4: fal.ai Polish
 # =============================================================================
 
-def polish_with_fal(pose_video_path, character_image_url, output_path):
-    log("POLISH", "Starting fal.ai render...")
+def polish_with_fal(pose_video_path, character_image_path, output_path):
+    """Sprint 4: Use Dreamactor v2 via fal_polish module."""
+    log("POLISH", "Starting fal.ai Dreamactor v2 render...")
+    try:
+        from fal_polish import polish_video
+        result = polish_video(pose_video_path, character_image_path, output_path)
+        if result:
+            log("POLISH", f"✅ {result}")
+            return True, "fal.ai Dreamactor v2 complete", result
+        return False, "fal.ai failed", pose_video_path
+    except ImportError:
+        log("POLISH", "fal_polish module not found — trying legacy", "WARN")
+        return _polish_legacy(pose_video_path, character_image_path, output_path)
+    except Exception as e:
+        log("POLISH", f"fal.ai failed: {e}", "ERROR")
+        return False, str(e), pose_video_path
+
+
+def _polish_legacy(pose_video_path, character_image_url, output_path):
+    """Legacy fallback — direct API call (pre-Sprint 4)."""
+    log("POLISH", "Using legacy fal.ai endpoint...")
     fal_key = None
     try:
         with open(os.path.expanduser("~/.openclaw/credentials/fal.json")) as f:
@@ -284,7 +303,7 @@ def run_pipeline(audio_path=None, text_input=None, character_url=None, output_na
         ok, msg, final_path = polish_with_fal(final_path, character_url, polished)
         results["stages"]["polish"] = {"status": "ok" if ok else "skipped", "message": msg}
     else:
-        results["stages"]["polish"] = {"status": "skipped", "message": "no character url"}
+        results["stages"]["polish"] = {"status": "skipped", "message": "no character url (use --character to enable fal.ai polish)"}
 
     results["final_video"] = str(final_path)
     results["status"] = "ok"
@@ -300,7 +319,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="SignBridge: Audio → ASL Signer Video")
     parser.add_argument("audio", nargs="?", help="Input audio file")
     parser.add_argument("--text", help="Text input instead of audio")
-    parser.add_argument("--character", help="Character image URL for fal.ai polish")
+    parser.add_argument("--character", help="Character image path for fal.ai polish (defaults to Fabio character sheet)")
     parser.add_argument("--output", help="Output filename prefix")
     args = parser.parse_args()
     result = run_pipeline(audio_path=args.audio, text_input=args.text, character_url=args.character, output_name=args.output)
