@@ -30,6 +30,11 @@ sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 app = FastAPI(title="SignBridge API", version="0.1.0")
 
+@app.get("/")
+async def root():
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(url="/dashboard/")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
