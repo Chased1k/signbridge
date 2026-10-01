@@ -119,11 +119,32 @@ SignBridge takes audio (voice notes, rambles, any spoken content) and produces a
 
 Kellen asked about JEV/KEV/Laya for constrained gloss matching. Research done:
 
-- **Jev**: TypeSafe AI's hosted System One model. 70-500ms, can't hallucinate, outputs typed decisions with probabilities. Early access.
-- **Kev**: Open-source Jev clone by Jared Palmer. Built on Qwen3.5/3.8. 4 sizes: 0.8B, 4B, 9B, 27B. **Kev-4B runs on 32GB Mac**. Drop-in for Jev API. Fine-tunable.
+- **Jev**: TypeSafe AI's hosted System One model. 70-500ms, can't hallucinate, outputs typed decisions with probabilities. Available via OpenRouter Decisions API (`POST /api/alpha/decisions`). Model ID: `typesafe/jev-1.13`.
+- **Kev**: Open-source Jev clone by Jared Palmer. Built on Qwen3.5/3.8. 4 sizes: 0.8B, 4B, 9B, 27B. Drop-in for Jev API. Fine-tunable.
 - **Laya**: Open-weight, ModernBERT-based, lighter, less accurate than Kev.
 
-**Plan for Sprint 3**: Install Kev-4B locally, feed it our 2,589 glosses as the allowed vocabulary for each word, get back exact gloss matches with confidence scores. Replace the current LLM-rephrase + deterministic-match approach.
+### Installation Attempt (2026-10-01)
+
+**BLOCKED on Watchtower** — PyTorch >= 2.6 has NO Intel macOS wheels. Last torch with Intel Mac support is 2.2.x (cp312 only). Kev requires `torch>=2.6,<2.9`.
+
+**What was installed:**
+- Python 3.13.13 via `uv python install 3.13`
+- Kev repo cloned to `~/projects/kev/`
+- Rust 1.99.0 installed (needed for cbor2 build)
+- Modal 1.6.0 installed in `/tmp/modal-env/` (for cloud deployment)
+- `uv sync --extra serve` FAILED: torch has no wheels for `macosx_x86_64`
+
+**Options for Sprint 3:**
+1. **Modal deploy** (RECOMMENDED): `modal setup` (needs browser auth from Kellen) → `modal deploy kev_serve.py` → get HTTPS endpoint. L40S GPU, scales to zero. Free tier has T4.
+   - Deploy script: `~/projects/kev/skills/kev-deploy/scripts/kev_serve.py`
+   - Command: `source /tmp/modal-env/bin/activate && modal setup && KEV_MODEL=jaredpalmer/kev-4b modal deploy ~/projects/kev/skills/kev-deploy/scripts/kev_serve.py`
+   - Result: `https://<workspace>--kev-api.modal.run` endpoint
+2. **OpenRouter Jev**: Sign up at openrouter.ai, get API key, use `typesafe/jev-1.13` via Decisions API. No local install needed. Costs per input token.
+3. **HuggingFace Space**: `https://jaredpalmer-kev.hf.space` has a Gradio API (`/gradio_api/call/decide`), but it returned errors during testing (model may have been loading). Could retry.
+4. **Patch torch requirement**: Force torch 2.2.x on cp312, patch Kev's pyproject.toml. Risky — may break model loading.
+5. **Use existing Ollama models**: Keep current Gemma4:cloud approach but improve the prompt with few-shot examples and stricter output format. Less accurate than Kev but no install needed.
+
+**Kellen needs to**: Run `modal setup` in a browser to authenticate Modal, then I can deploy Kev-4B to Modal.
 
 ## Dashboard Update Rule
 
@@ -137,11 +158,22 @@ Kellen asked about JEV/KEV/Laya for constrained gloss matching. Research done:
 
 ## What To Do Next (Sprint 3)
 
-1. Create GitHub repo and push code
-2. Install Kev-4B: `git clone https://github.com/jaredpalmer/kev.git && uv sync --extra serve && uv run --extra serve python -m kev.serve --run jaredpalmer/kev-4b --port 8009`
-3. Rewrite `llm_rephrase_and_map()` in pipeline.py to call Kev instead of Ollama
-4. Test gloss matching accuracy with Kev vs current 76%
-5. Wire up Whisper for real audio input
-6. Implement fal.ai polish step (Dreamactor or similar)
-7. Update dashboard with Sprint 3 results
-8. Commit and push
+1. **Kellen: authenticate Modal** — `source /tmp/modal-env/bin/activate && modal setup` (opens browser, creates `~/.modal.toml`)
+2. **Deploy Kev-4B to Modal** — `KEV_MODEL=jaredpalmer/kev-4b modal deploy ~/projects/kev/skills/kev-deploy/scripts/kev_serve.py` → get endpoint URL
+3. **Create GitHub repo** and push signbridge code
+4. **Rewrite `llm_rephrase_and_map()`** in pipeline.py to call Kev endpoint (System One API: `POST /v1/systemone` with state + questions)
+5. **Test gloss matching accuracy** with Kev vs current 76%
+6. **Wire up Whisper** for real audio input (faster-whisper, CPU)
+7. **Implement fal.ai polish** step (Dreamactor or similar video-to-video)
+8. **Update dashboard** with Sprint 3 results
+9. **Commit and push**
+
+## Environment State (as of 2026-10-01 08:00 MST)
+
+- Python 3.13.13 installed via uv
+- Rust 1.99.0 installed at `~/.cargo/`
+- Modal 1.6.0 installed in `/tmp/modal-env/` (NOT authenticated)
+- Kev repo at `~/projects/kev/` (uv sync FAILED — no torch for Intel Mac)
+- Signbridge API running on port 18105 (may need restart after session change)
+- Cloudflared running (pid 36335) — DO NOT KILL
+- All wdfab.io subdomains working (revenue, health, stt, files, mlb-sep30, bea, buzz-wd, signbridge)
