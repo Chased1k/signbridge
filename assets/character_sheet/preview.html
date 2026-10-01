@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fabio — SignBridge Character Sheet</title>
+  <style>
+    :root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+    body { margin: 0; padding: 32px; background: #ececec; color: #202020; }
+    main { max-width: 1600px; margin: auto; }
+    h1, p { text-align: center; }
+    .sheet { display: block; width: 100%; height: auto; margin: 28px 0 42px; background: white;
+              box-shadow: 0 8px 28px #0002; }
+    .grid { display: grid; gap: 20px; margin-bottom: 20px; }
+    .body-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .head-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 1200px; margin-inline: auto; }
+    figure { margin: 0; background: white; box-shadow: 0 4px 18px #0002; }
+    figure img { display: block; width: 100%; aspect-ratio: 3 / 4; object-fit: contain; background: white; }
+    .head-grid figure img { aspect-ratio: 1 / 1; }
+    figcaption { padding: 12px; text-align: center; font-weight: 700; letter-spacing: .08em; }
+    @media (max-width: 800px) {
+      .body-grid, .head-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      body { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Fabio — SignBridge Character Reference</h1>
+    <p>Photorealistic reference views for Dreamactor video generation</p>
+    <img class="sheet" src="fabio_character_sheet.png" alt="Complete Fabio character sheet">
+    <section class="grid body-grid"><figure><img src="fabio_front.png" alt="Fabio front view"><figcaption>FRONT</figcaption></figure>
+<figure><img src="fabio_side.png" alt="Fabio side profile view"><figcaption>SIDE PROFILE</figcaption></figure>
+<figure><img src="fabio_back.png" alt="Fabio back view"><figcaption>BACK</figcaption></figure>
+<figure><img src="fabio_three_quarter.png" alt="Fabio three-quarter view"><figcaption>THREE-QUARTER</figcaption></figure></section>
+    <section class="grid head-grid"><figure><img src="fabio_head_neutral.png" alt="Fabio neutral headshot"><figcaption>NEUTRAL</figcaption></figure>
+<figure><img src="fabio_head_smiling.png" alt="Fabio smiling headshot"><figcaption>SMILING</figcaption></figure>
+<figure><img src="fabio_head_serious.png" alt="Fabio serious headshot"><figcaption>SERIOUS</figcaption></figure></section>
+  </main>
+</body>
+</html>
