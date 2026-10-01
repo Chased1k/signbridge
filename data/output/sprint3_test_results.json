@@ -1,0 +1,95 @@
+{
+  "job_id": "sprint3_test",
+  "started_at": "2026-10-01T08:30:12.319435",
+  "stages": {
+    "transcribe": {
+      "status": "ok",
+      "data": {
+        "text": "Hello, my name is Kellen, I want to tell you about something exciting.",
+        "segments": [
+          {
+            "start": 0.0,
+            "end": 4.0,
+            "text": "Hello, my name is Kellen, I want to tell you about something exciting."
+          }
+        ],
+        "language": "en",
+        "duration": 4.3
+      }
+    },
+    "translate": {
+      "status": "ok",
+      "data": {
+        "summary": "HELLO, NAME ME KELLEN, EXCITING THING ME TELL-YOU",
+        "glosses": [
+          {
+            "gloss": "HELLO",
+            "start": 0.0,
+            "end": 2.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "NAME",
+            "start": 2.0,
+            "end": 4.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "ME",
+            "start": 4.0,
+            "end": 6.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "FINGERSPELL",
+            "text_to_spell": "KELLEN",
+            "start": 6.0,
+            "end": 9.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "FINGERSPELL",
+            "text_to_spell": "EXCITING",
+            "start": 9.0,
+            "end": 12.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "THING",
+            "start": 12.0,
+            "end": 14.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "ME",
+            "start": 14.0,
+            "end": 16.0,
+            "expression": "neutral"
+          },
+          {
+            "gloss": "FINGERSPELL",
+            "text_to_spell": "TELL-YOU",
+            "start": 16.0,
+            "end": 19.0,
+            "expression": "neutral"
+          }
+        ],
+        "coverage": {
+          "direct_hit": 5,
+          "fingerspelled": 3
+        }
+      }
+    },
+    "assemble": {
+      "status": "ok",
+      "message": "5 segments, 3 missing"
+    },
+    "polish": {
+      "status": "skipped",
+      "message": "no character url"
+    }
+  },
+  "final_video": "/Users/watchtower/projects/signbridge/data/output/sprint3_test_pose.mp4",
+  "status": "ok",
+  "completed_at": "2026-10-01T08:30:15.658724"
+}

@@ -43,8 +43,23 @@ def transcribe_audio(audio_path, model_size="base"):
     log("TRANSCRIBE", f"Loading Whisper {model_size}...")
     from faster_whisper import WhisperModel
     model = WhisperModel(model_size, device="cpu", compute_type="int8")
-    log("TRANSCRIBE", f"Transcribing {audio_path}...")
-    segments, info = model.transcribe(str(audio_path), word_timestamps=True)
+
+    # Convert to 16kHz mono WAV if not already wav (av 19 compat)
+    audio_str = str(audio_path)
+    if not audio_str.lower().endswith('.wav'):
+        wav_path = OUTPUT_DIR / f"_whisper_input_{int(time.time())}.wav"
+        log("TRANSCRIBE", f"Converting to WAV: {audio_str} → {wav_path}")
+        r = subprocess.run(
+            ["ffmpeg", "-y", "-i", audio_str, "-ar", "16000", "-ac", "1", str(wav_path)],
+            capture_output=True, text=True
+        )
+        if r.returncode != 0:
+            log("TRANSCRIBE", f"ffmpeg conversion failed: {r.stderr[-200:]}", "ERROR")
+            return {"text": "", "segments": [], "language": "en", "duration": 0}
+        audio_str = str(wav_path)
+
+    log("TRANSCRIBE", f"Transcribing {audio_str}...")
+    segments, info = model.transcribe(audio_str, word_timestamps=True)
     seg_list, full_text = [], []
     for seg in segments:
         seg_list.append({"start": round(seg.start, 2), "end": round(seg.end, 2), "text": seg.text.strip()})

@@ -13,7 +13,7 @@ SignBridge takes audio (voice notes, rambles, any spoken content) and produces a
 
 - **Code:** `~/projects/signbridge/`
 - **Dashboard:** https://signbridge.wdfab.io (port 18105, Cloudflare tunnel)
-- **GitHub:** Chased1k/signbridge — **NOT created yet**, code is local only
+- **GitHub:** https://github.com/Chased1k/signbridge — created and pushed
 - **PRD:** `~/projects/signbridge/docs/prd.md`
 - **Tech Debt:** `~/projects/signbridge/docs/tech-debt.md`
 - **Promo Script:** `~/projects/signbridge/docs/promo-script.md`
@@ -37,12 +37,22 @@ SignBridge takes audio (voice notes, rambles, any spoken content) and produces a
 - **Dashboard**: signbridge.wdfab.io — pipeline diagram, stats, job submission form, Sprint 2 demo with embedded test video, tech debt panel
 - **gloss_remaps.py**: Updated to use deictic signs directly, old broken remaps removed, zero-morpheme words (IS/ARE/BE/TO) in SKIP_WORDS
 
-### Sprint 3 (NEXT) — NOT STARTED
+### Sprint 3 (Oct 1) — COMPLETE
+- **faster-whisper installed** in venv, CPU mode (int8). Audio → WAV conversion via ffmpeg.
+- **End-to-end pipeline test**: macOS `say` voice → Whisper transcription → LLM rephrase → gloss match → pose video. 3.3s total.
+- **Test results**: "Hello, my name is Kellen, I want to tell you about something exciting." → 8 signs (5 direct hits, 3 fingerspelled: KELLEN, EXCITING, TELL-YOU). Output: 938KB pose video.
+- **GitHub repo created**: https://github.com/Chased1k/signbridge — code pushed.
+- **Tech debt updated**: FW-008 (video-to-pose engine for ASL hand/finger mapping), FW-009 (YouTube ASL video source for pose database).
+- **Jev readiness confirmed**: OpenRouter key works, `typesafe/jev-1.13` responds on Decisions API. Ready for post-POC integration.
+- **Decision**: Keep Gemma4:cloud LLM rephrasing for POC. Jev integration deferred to post-POC per Kellen.
+
+### Sprint 4 (NEXT) — POST-POC ENHANCEMENT
 **Priorities:**
-1. **Kev integration** — Replace LLM rephrasing with Kev-4B (System One model) for constrained gloss matching. Install Kev locally, point at our 2,589 gloss vocabulary. No more "TELL-YOU" hallucinations.
-2. **fal.ai polish** — Run skeleton pose video through fal.ai Dreamactor (or similar video-to-video model) with a character sheet image to get photorealistic signer video
-3. **Real audio input** — Wire up Whisper transcription (faster-whisper, CPU) for actual voice note input
-4. **Constrained decoding exploration** — Kev vs Outlines vs fine-tuned model
+1. **Jev integration** — Replace LLM rephrasing with `typesafe/jev-1.13` via OpenRouter Decisions API for constrained gloss matching. No more "TELL-YOU" hallucinations.
+2. **fal.ai polish** — Run skeleton pose video through fal.ai Dreamactor with character image for photorealistic signer video
+3. **Competitive comparison** — Compare POC output to commercial ASL products for same input to evaluate ASLLVD quality
+4. **FW-008 evaluation** — Benchmark video-to-pose engines for ASL hand/finger detail
+5. **FW-009** — YouTube ASL video mining for expanded pose database (if quality gap found)
 
 ## Key Architecture Decisions
 

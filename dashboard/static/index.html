@@ -176,7 +176,7 @@ footer { text-align: center; padding: 32px 0; color: var(--muted); font-size: 0.
 <div class="hero">
   <h1>🐴 SignBridge</h1>
   <p>Speech → ASL Signer Video. On-demand, expressive, accessible.</p>
-  <div class="badge">POC Sprint 2 · 2,589 signs · MediaPipe + synthetic deictic · fal.ai polish</div>
+  <div class="badge">POC Sprint 3 · 2,589 signs · Whisper + MediaPipe + synthetic deictic · Jev-ready post-POC</div>
 </div>
 
 <!-- Stats -->
@@ -262,34 +262,35 @@ footer { text-align: center; padding: 32px 0; color: var(--muted); font-size: 0.
   • <span class="highlight">fal.ai Dreamactor</span> — photorealistic motion transfer</div>
 </div>
 
-<!-- Sprint 2 Demo -->
+<!-- Sprint 3 Demo -->
 <div class="panel" style="margin-bottom: 24px;">
-  <h2>Sprint 2 Demo — Test Run</h2>
+  <h2>Sprint 3 Demo — Real Audio → ASL Video (End-to-End)</h2>
   <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 16px;">
     <div>
       <div style="margin-bottom: 12px;">
-        <strong style="color: var(--accent2);">Input Text:</strong>
+        <strong style="color: var(--accent2);">Audio Input:</strong>
         <div style="margin-top: 8px; padding: 12px; background: var(--surface2); border-radius: 8px; font-size: 0.85rem; line-height: 1.6; color: var(--muted);">
-          "Hello. My name is Kellen. I want to tell you about a new project. We are building a tool that translates voice into sign language video. This is important for accessibility."
+          🎙️ macOS <code>say</code> TTS → AIFF → ffmpeg → 16kHz WAV<br>
+          "Hello, my name is Kellen, I want to tell you about something exciting."
         </div>
       </div>
       <div style="margin-bottom: 12px;">
-        <strong style="color: var(--accent2);">LLM Rephrased (ASL grammar):</strong>
+        <strong style="color: var(--accent2);">Whisper Transcription → LLM Rephrased (ASL grammar):</strong>
         <div style="margin-top: 8px; padding: 12px; background: var(--surface2); border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; line-height: 1.6;">
-          HELLO. NAME ME KELLEN. NEW PROJECT, ME TELL-YOU. TOOL VOICE TRANSLATE SIGN VIDEO, WE BUILD. ACCESSIBILITY, IMPORTANT.
+          HELLO, NAME ME KELLEN, EXCITING THING ME TELL-YOU
         </div>
       </div>
       <div style="display: flex; gap: 16px; margin-top: 16px;">
         <div style="flex: 1; text-align: center; padding: 12px; background: rgba(0,184,148,0.1); border-radius: 8px;">
-          <div style="font-size: 1.5rem; font-weight: 700; color: var(--success);">13</div>
+          <div style="font-size: 1.5rem; font-weight: 700; color: var(--success);">5</div>
           <div style="font-size: 0.75rem; color: var(--muted);">Direct Hits</div>
         </div>
         <div style="flex: 1; text-align: center; padding: 12px; background: rgba(253,203,110,0.1); border-radius: 8px;">
-          <div style="font-size: 1.5rem; font-weight: 700; color: var(--warn);">4</div>
+          <div style="font-size: 1.5rem; font-weight: 700; color: var(--warn);">3</div>
           <div style="font-size: 0.75rem; color: var(--muted);">Fingerspelled</div>
         </div>
         <div style="flex: 1; text-align: center; padding: 12px; background: rgba(108,92,231,0.1); border-radius: 8px;">
-          <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent);">76%</div>
+          <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent);">63%</div>
           <div style="font-size: 0.75rem; color: var(--muted);">Sign Coverage</div>
         </div>
       </div>
@@ -301,27 +302,18 @@ footer { text-align: center; padding: 32px 0; color: var(--muted); font-size: 0.
         <gloss-tag class="gloss-hit">✅ NAME</gloss-tag>
         <gloss-tag class="gloss-hit">✅ ME</gloss-tag>
         <gloss-tag class="gloss-fingerspell">🔤 KELLEN</gloss-tag>
-        <gloss-tag class="gloss-hit">✅ NEW</gloss-tag>
-        <gloss-tag class="gloss-hit">✅ PROJECT</gloss-tag>
+        <gloss-tag class="gloss-fingerspell">🔤 EXCITING</gloss-tag>
+        <gloss-tag class="gloss-hit">✅ THING</gloss-tag>
         <gloss-tag class="gloss-hit">✅ ME</gloss-tag>
         <gloss-tag class="gloss-fingerspell">🔤 TELL-YOU</gloss-tag>
-        <gloss-tag class="gloss-fingerspell">🔤 TOOL</gloss-tag>
-        <gloss-tag class="gloss-hit">✅ VOICE</gloss-tag>
-        <gloss-tag class="gloss-hit">✅ TRANSLATE</gloss-tag>
-        <gloss-tag class="gloss-hit">✅ SIGN</gloss-tag>
-        <gloss-tag class="gloss-hit">✅ VIDEO</gloss-tag>
-        <gloss-tag class="gloss-hit">✅ WE</gloss-tag>
-        <gloss-tag class="gloss-hit">✅ BUILD</gloss-tag>
-        <gloss-tag class="gloss-fingerspell">🔤 ACCESSIBILITY</gloss-tag>
-        <gloss-tag class="gloss-hit">✅ IMPORTANT</gloss-tag>
       </div>
       <div class="video-container" style="margin-top: 12px;">
         <video controls loop muted style="width: 100%; display: block;">
-          <source src="/dashboard/test_sprint2.mp4" type="video/mp4">
+          <source src="/dashboard/sprint3_test.mp4" type="video/mp4">
         </video>
       </div>
       <div style="margin-top: 8px; font-size: 0.75rem; color: var(--muted); text-align: center;">
-        13 pose segments concatenated via ffmpeg · 3.3MB · &lt;1s processing time
+        5 pose segments · 938KB · 3.3s total pipeline (1.5s Whisper + 0.1s LLM + 1.7s assemble)
       </div>
     </div>
   </div>
@@ -371,6 +363,20 @@ footer { text-align: center; padding: 32px 0; color: var(--muted); font-size: 0.
       <div>
         <strong>FW-007: Database & pipeline scale-up</strong>
         <div class="td-desc">If POC succeeds: RTMPose on dedicated GPU, vector search for semantic gloss matching, caching layer, queue system.</div>
+      </div>
+    </div>
+    <div class="tech-debt-item">
+      <span class="td-priority td-medium">MED</span>
+      <div>
+        <strong>FW-008: Video-to-pose engine optimized for ASL</strong>
+        <div class="td-desc">Current MediaPipe (75 keypoints) may miss fine hand shapes critical for ASL. Need engine with detailed hand/finger mapping (21+ per hand). Candidates: MediaPipe Holistic, OpenPose hand model, SMPL-X. Post-POC evaluation.</div>
+      </div>
+    </div>
+    <div class="tech-debt-item">
+      <span class="td-priority td-medium">MED</span>
+      <div>
+        <strong>FW-009: YouTube ASL video source for pose database</strong>
+        <div class="td-desc">ASLLVD is citation-form (isolated signs). YouTube has thousands of hours of ASL interpreters with naturalistic signing. Mine for expanded, higher-quality pose library. Compare POC output to commercial products first to determine if quality gap exists.</div>
       </div>
     </div>
   </div>

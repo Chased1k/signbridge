@@ -57,3 +57,23 @@
 - SignAll, Signly, Avatarslike are the closest competitors.
 - Most are avatar-based (not photorealistic video).
 - Our angle: photorealistic signer video via fal.ai polish + open-source pose data.
+
+### FW-008: Video-to-pose engine optimized for ASL (MEDIUM, post-POC)
+- Current MediaPipe approach uses 75 keypoints which may miss fine hand shapes critical for ASL.
+- ASL distinguishes meaning through handshape, orientation, location, and movement — finger detail is essential.
+- Need to evaluate pose engines that capture detailed hand/finger mappings:
+  - MediaPipe Holistic (543 points, includes 21 hand landmarks × 2 = 42 hand points)
+  - RTMPose (133 keypoints, better body coverage but similar hand detail to MediaPipe)
+  - OpenPose (hand model: 21 keypoints per hand, body+hand variant)
+  - MMPose with hand-specific configs (e.g., RTLAPe, Hand5)
+  - SAPIEN / SMPL-X (body + detailed hand rig, 127 hand keypoints)
+- Key requirement: handshape discrimination (e.g., flat-O vs bent-O vs open-B) that ASL depends on.
+- Action: Benchmark 2-3 engines on ASL sample videos, compare handshape fidelity.
+
+### FW-009: YouTube ASL video source for pose database (MEDIUM, post-POC)
+- ASLLVD is a citation-form dataset (isolated signs, 6 signers, academic context). Quality may not reflect naturalistic signing.
+- YouTube has thousands of hours of ASL interpreter videos (news, speeches, Deaf creators) with diverse signers, natural expression, and real-world signing speed.
+- Plan: Download ASL interpreter videos from YouTube → run pose extraction → build expanded pose library with more signs, variations, and natural movement.
+- Legal: Fair use for research; commercial use needs licensing review.
+- Quality concern: Kellen wants to compare POC output against commercial products before committing to this. If ASLLVD quality is sufficient, this becomes a scale/variety improvement rather than a quality fix.
+- Action: After POC, compare our output to commercial ASL translation products for the same input. If quality gap exists, prioritize FW-008 + FW-009 together.
