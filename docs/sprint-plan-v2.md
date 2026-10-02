@@ -1,432 +1,418 @@
 # SignBridge — Sprint Plan v2 (Sprints 5–10)
 
-> **Phase:** USABILITY — 3D SMPL-X/MANO + Blender pipeline
+> **Phase:** USABILITY — 3D motion capture + Blender pipeline
 > Created: 2026-10-01
+> Updated: 2026-10-01
 > Status: PLANNING
+> Dataset: StudioGalt Sign Language Mocap Archive (CC0)
 
 ---
 
-## Sprint 5: SignAvatars Access + Data Evaluation + Blender Install
+## Sprint 5: StudioGalt Download + Blender Install + Headless Test + FBX Import Test
 
-**Goal:** Get the data, evaluate it, and prove Blender headless works on Watchtower.
+**Goal:** Get the data, install Blender, and prove the headless FBX import pipeline works on Watchtower.
 
 ### Tasks
 
-1. **Request SignAvatars access**
-   - Fill out Google Form: https://docs.google.com/forms/d/e/1FAIpQLSc6xQJJMf_R4xJ1sIwDL6FBIYw4HbVVv_HUgCqeiguWX5XGPg/viewform
-   - Wait for email with download links
-   - Download Word subset (WLASL) annotations + WLASL_v0.3.json
-   - Download human_model_files (SMPL-X, MANO model files)
+1. **Download StudioGalt repository**
+   - `git clone https://github.com/StudioGalt/Sign-Language-Mocap-Archive.git` (or selective download — repo is large)
+   - Verify structure: `SG ASL Dictionary/`, `SG ASL Fingerspelling/`, `Rigs/`, `Documentation/`
+   - Count signs per letter, total count = 2,587
+   - Spot-check a few sign directories: verify FBX files, .mkv preview, ReadMe.txt present
+   - Download `Rigs/Galtis 8 20260401.blend` (32MB) — this is our base scene
 
-2. **Download and install Blender**
-   - Install Blender 3.1+ (LTS preferred) on Watchtower
+2. **Install Blender on Watchtower**
+   - Download Blender LTS (3.6 LTS or 4.2 LTS) for macOS (Intel)
+   - Install to /Applications/Blender.app
    - Verify CLI: `blender --version`
    - Test headless mode: `blender --background --python-expr "import bpy; print(bpy.app.version)"`
-   - **OPEN QUESTION:** Check AMD 5500M Metal support for GPU rendering
+   - **CHECK:** Metal support for Eevee on AMD 5500M (macOS Metal backend)
+   - **CHECK:** Does Blender see the AMD GPU? `blender --background --python-expr "import bpy; print(bpy.app.devices)"`
 
-3. **Install SMPL-X Blender add-on**
-   - Download from: https://github.com/zjucxh/smplx_blender_addon (or Meshcapade version)
-   - Install via Blender preferences (or copy to addons folder)
-   - Test in headless mode: load add-on, add SMPL-X model, verify mesh created
-   - Script: `blender --background --python test_smplx_addon.py`
-
-4. **Parse SignAvatars Word data**
-   - Load WLASL_v0.3.json — index words → video_ids
-   - Load sample .pkl files — verify SMPL-X param dimensions (182,)
-   - Extract parameter breakdown: root_pose, body_pose, hand_poses, jaw, betas, expression, cam_trans
-   - Build initial gloss → pkl_path mapping table
-   - Statistics: how many unique words, average frames per sign, any missing/corrupt files
-
-5. **Coverage analysis: ASLLVD glosses vs WLASL words**
-   - Load our 2,589 ASLLVD glosses
-   - Load WLASL 2,000 words
-   - Compute overlap: exact match, case-insensitive match, lemma match
-   - Report: X% of our glosses found in SignAvatars Word subset
-   - Identify high-frequency missing signs (common words not in WLASL)
-
-6. **Blender headless render test**
-   - Create minimal scene: camera, light, default cube
-   - Render single frame via CLI: `blender -b test.blend -f 1 -o //test_ -F PNG`
+3. **Blender headless render test (minimal)**
+   - Create minimal scene via Python: camera, light, default cube
+   - Render single frame: `blender --background --python test_minimal_render.py`
    - Verify output PNG created
-   - Test with SMPL-X model: add model, set T-pose, render single frame
-   - Measure render time (CPU vs GPU if available)
+   - Measure render time (CPU vs Metal GPU if available)
+   - Test Eevee vs Cycles: compare render time and quality
+
+4. **Load Galtis rig .blend headless**
+   - Script: `blender --background Galtis_8_20260401.blend --python test_rig_load.py`
+   - Verify: armature found, mesh found, shapekeys present
+   - List bones in armature, count them
+   - List available shapekeys (FACS expressions)
+   - Render Galtis in T-pose — verify character renders correctly
+   - Measure load time and render time
+
+5. **FBX import test**
+   - Pick a simple sign (e.g., "HELLO" or "MOTHER")
+   - Import FBX (No Mesh Full variant) into Galtis scene via Python
+   - Verify: armature imported, animation data present
+   - Check: does imported armature match Galtis rig bone naming?
+   - Render a frame from the imported animation
+   - Document: import time, bone mapping differences, any errors
+
+6. **Build initial sign index**
+   - Script: walk `SG ASL Dictionary/` directory tree
+   - Extract: sign name, alt number, date, FBX file paths
+   - Output: `sign_index.json` — mapping of sign names to FBX paths
+   - Statistics: total signs, signs with multiple alts, date range
+   - This becomes the foundation for the gloss → sign lookup table
 
 ### Deliverables
-- SignAvatars dataset downloaded and parsed
-- WLASL → gloss mapping table (initial)
-- Coverage analysis report (ASLLVD vs WLASL overlap)
-- Blender installed, headless mode verified, SMPL-X add-on working
-- Single-frame SMPL-X render test completed
+- StudioGalt repository cloned and verified
+- Blender installed, headless mode working, GPU/Metal status confirmed
+- Galtis rig loads and renders in headless mode
+- FBX import works via Python script
+- `sign_index.json` — all 2,587 signs indexed with paths
+- Render time benchmarks (Eevee vs Cycles, single frame)
 
-### Estimated Time: 3-5 days
+### Estimated Time: 3–5 days
 
 ---
 
-## Sprint 6: SMPL-X to Blender Rig Pipeline + Minimal Scene Setup
+## Sprint 6: Galtis Rig Scene Setup + Camera + Lighting + First Render Test
 
-**Goal:** Load SignAvatars .pkl pose data into Blender, apply to SMPL-X rig, and render a single sign animation.
+**Goal:** Build the base Blender scene with camera, lighting, and render configuration. Produce the first animated sign render.
 
 ### Tasks
 
-1. **Build SMPL-X pose loader (Python)**
-   - Function: `load_smplx_pkl(pkl_path) → dict of param arrays`
-   - Parse 182-dim SMPL-X params into components (root, body, hands, jaw, betas, expr, cam)
-   - Handle both `smplx` (smooth) and `unsmooth_smplx` keys
-   - Validate: check dimensions, NaN check, range check
+1. **Build base scene script (`setup_scene.py`)**
+   - Load Galtis 8 .blend as base
+   - Set camera position: front-facing, medium shot (waist up)
+   - Configure camera: focal length, depth of field (optional)
+   - 3-point lighting setup: key, fill, backlight (scriptable via Python)
+   - Background: solid color or simple gradient (green screen option for later compositing)
+   - Set render settings: resolution (720p target), frame rate (30fps), output format (PNG sequence or MP4)
+   - Set render engine: Eevee (default for dev), Cycles (option for quality)
 
-2. **Build Blender pose applicator (Python)**
-   - Function: `apply_smplx_to_rig(armature, smplx_params, frame)`
-   - Map SMPL-X body_pose (63-dim, 21 joints × 3) to Blender bone rotations
-   - Map MANO hand_pose (45-dim, 15 joints × 3) to hand bone rotations
-   - Set root_pose, jaw_pose, betas, expression
-   - Insert keyframes for all bones at the given frame
+2. **Build FBX import + retarget script (`sign_importer.py`)**
+   - Function: `import_sign_fbx(filepath) → armature, action`
+   - Import FBX (No Mesh Full) into scene
+   - Map imported armature bones → Galtis armature bones
+   - **Key challenge:** bone name matching between FBX armature and Galtis rig
+   - Test with 5+ different signs to verify mapping is consistent
+   - If bone names differ: build bone mapping dictionary
+   - If rigs are identical (same source): direct transfer should work
 
-3. **Build sign-to-action converter**
-   - Input: .pkl file for one sign
-   - Output: Blender Action with keyframes for all frames in the sign
-   - Process: for each frame in .pkl, apply pose and insert keyframes
-   - Save Action to Blender data (named by gloss)
+3. **Build animation transfer script**
+   - Function: `transfer_animation(source_armature, target_armature, action, frame_range)`
+   - Copy animation data from imported FBX armature to Galtis deform rig
+   - Handle: root motion, body joints, hand bones, facial shapekeys
+   - Test: import "HELLO" FBX, transfer to Galtis, render animation
+   - Verify: Galtis performs the correct motion
 
-4. **Set up minimal Blender scene**
-   - Scene file: `signbridge_scene.blend`
-   - SMPL-X neutral model added and positioned (feet on ground, facing camera)
-   - Camera: 3/4 front view, upper body framing, 1280×720
-   - Lighting: 3-point setup (key area light, fill area light, rim area light)
-   - Background: solid neutral color (or green screen plane)
-   - Renderer: Eevee (for speed) with ambient occlusion + soft shadows
-   - World: simple HDRI or uniform color
+4. **First animated sign render**
+   - Full pipeline: load Galtis → import FBX → transfer animation → render
+   - Render "HELLO" sign as MP4 (or PNG sequence → ffmpeg)
+   - Target: 2-3 second animation at 30fps (60-90 frames)
+   - Measure total pipeline time: import + transfer + render
+   - Quality check: does the motion look correct? Compare to .mkv preview
 
-5. **Render single sign test**
-   - Pick a common sign from SignAvatars (e.g., "HELLO" or "MY")
-   - Load .pkl → apply to rig → create Action → render to MP4
-   - CLI: `blender --background signbridge_scene.blend --python render_sign.py -- --pkl hello.pkl --output hello.mp4`
-   - Verify output: correct pose, hands visible, smooth motion
-   - Measure render time per frame and total
+5. **Render optimization**
+   - Test Eevee render settings: samples, resolution scale, tile size
+   - Test Cycles (CPU) for quality comparison — is it viable for dev iteration?
+   - Determine: fastest acceptable render config for development
+   - Determine: quality render config for final output
+   - Record: render time per frame, per second of animation
 
-6. **Batch render test (5 signs)**
-   - Render 5 different signs individually
-   - Verify each produces correct output
-   - Measure average render time per sign
-   - Save individual sign Actions to .blend library file
+6. **Batch render test (3 signs)**
+   - Import and render 3 different signs independently
+   - Verify each renders correctly
+   - Measure: does load time dominate? Can we reuse the base scene across signs?
+   - Strategy: load base scene once, import/sign/render sequentially
 
 ### Deliverables
-- `smplx_loader.py` — Python module to load and parse .pkl files
-- `blender_pose_applicator.py` — Blender Python script to apply SMPL-X params to rig
-- `signbridge_scene.blend` — Minimal Blender scene with SMPL-X model, camera, lights
-- `render_sign.py` — CLI script: load .pkl, apply pose, render single sign to video
-- 5 test sign videos rendered
-- Render time benchmarks (per-frame, per-sign)
+- `setup_scene.py` — camera, lighting, render config
+- `sign_importer.py` — FBX import + bone retargeting
+- `render_pipeline.py` (initial) — orchestrator: load → import → transfer → render
+- First animated sign render (MP4)
+- Render time benchmarks and recommended settings
+- Batch render test (3 signs)
 
-### Estimated Time: 5-7 days
+### Estimated Time: 5–7 days
 
 ---
 
-## Sprint 7: Gloss to SignAvatars Mapping + Pose Library Rebuild
+## Sprint 7: Gloss → StudioGalt Sign Mapping + Pose Library Build
 
-**Goal:** Build the complete gloss → 3D pose mapping table, with fallbacks.
+**Goal:** Build the lookup table that maps ASL glosses to StudioGalt FBX files. Maximize coverage.
 
 ### Tasks
 
-1. **Build gloss → SignAvatars mapping**
-   - Parse WLASL_v0.3.json: extract all words → video_ids
-   - Match against our 2,589 ASLLVD glosses:
-     - Exact match (case-insensitive)
-     - Lemma match (run → RUN, running → RUN)
-     - Synonym match (using existing gloss_remaps.py logic)
-   - For matched glosses: record video_id, pkl_path, num_frames
-   - For unmatched glosses: mark as "needs fallback"
+1. **Build gloss → sign name mapping**
+   - Load ASLLVD gloss list (2,589 glosses from POC)
+   - Load StudioGalt sign index (from Sprint 5: `sign_index.json`)
+   - **Matching strategy (cascade):**
+     1. Direct match (case-insensitive): "MOTHER" → "MOTHER"
+     2. Synonym match: "MOM" → "MOTHER" (use synonym dictionary)
+     3. Lemma match: "running" → "RUN" (stemming)
+     4. LLM fuzzy match: use LLM to suggest closest sign for unmatched glosses
+     5. Fingerspell fallback: proper nouns and unmatched → `SG ASL Fingerspelling/`
+   - Output: `gloss_to_sign_map.json` — gloss → StudioGalt directory name + FBX path
+   - Report: coverage %, unmatched glosses (sorted by frequency)
 
-2. **Build fallback chain**
-   - Tier 1: SignAvatars Word subset (3D SMPL-X)
-   - Tier 2: ASLLVD/MediaPipe 2D poses (existing pose library)
-   - Tier 3: Deictic synthetic signs (existing 20 pronouns)
-   - Tier 4: Fingerspelling (letter-by-letter)
-   - Track source per gloss in pose_lookup_v2.json
+2. **Handle multiple versions (Alt selection)**
+   - For signs with Alt 1, Alt 2, etc.: always select latest date
+   - Logic: parse date from directory name, sort by date descending, pick first
+   - Document: which signs have multiple versions, which is "best"
 
-3. **Pre-process SignAvatars .pkl files**
-   - For each matched gloss, load .pkl and validate
-   - Convert to standardized format if needed (ensure 182-dim smplx key)
-   - Cache processed pose data for fast loading
-   - Build index file: `signavatars_pose_index.json`
+3. **Build fingerspelling lookup**
+   - Index `SG ASL Fingerspelling/Letters/` — A through Z
+   - Index `SG ASL Fingerspelling/Numbers/` — 0 through 9 (and common number patterns)
+   - Build: `fingerspell_map.json` — letter/number → FBX path
+   - Test: render "A", "B", "C" as individual signs
 
-4. **Update gloss_remaps.py**
-   - Add SignAvatars-specific remaps (WLASL word variations)
-   - Update SKIP_WORDS, ALWAYS_FINGERSPELL if WLASL coverage differs
-   - Add synonym mapping for WLASL words not in ASLLVD
+4. **Coverage analysis**
+   - Compare: POC vocabulary (2,589 ASLLVD glosses) vs StudioGalt (2,587 signs)
+   - Compute overlap: exact, synonym, lemma matches
+   - Identify: high-frequency missing signs (common words not in StudioGalt)
+   - Identify: StudioGalt signs not in our gloss list (potential vocabulary expansion)
+   - Target: 85%+ coverage with StudioGalt + fingerspelling fallback
 
-5. **Coverage report**
-   - Total glosses: 2,589
-   - SignAvatars matches: X (X%)
-   - ASLLVD fallback: Y (Y%)
-   - Deictic: 20 (0.8%)
-   - Fingerspell: Z (Z%)
-   - Target: 85%+ covered by Tier 1+2
+5. **Build pose library module (`pose_library.py`)**
+   - Class: `StudioGaltLibrary`
+   - Methods:
+     - `lookup(gloss) → fbx_path or None`
+     - `lookup_fingerspell(letter) → fbx_path`
+     - `get_sign_versions(sign_name) → list of (date, fbx_path)`
+     - `resolve_sign(gloss) → (fbx_path, type)` where type = "sign" or "fingerspell"
+   - Load `gloss_to_sign_map.json` and `fingerspell_map.json` on init
+   - Cache: keep frequently used paths in memory
 
-6. **Update FastAPI stats endpoint**
-   - Report pose source distribution
-   - Report coverage by tier
-   - Update dashboard with 3D library stats
+6. **Integration test: gloss sequence → FBX paths**
+   - Take 10 sample sentences from POC test set
+   - Run through: LLM gloss → pose library lookup → FBX paths
+   - Verify: all glosses resolve (sign or fingerspell fallback)
+   - Report: hit rate, fingerspell rate, missing signs
 
 ### Deliverables
-- `signavatars_pose_index.json` — Gloss → .pkl mapping
-- `pose_lookup_v2.json` — Updated pose lookup with source tiers
-- Updated `gloss_remaps.py` with SignAvatars remaps
-- Coverage report with tier breakdown
-- Updated dashboard stats
+- `gloss_to_sign_map.json` — complete gloss → StudioGalt mapping
+- `fingerspell_map.json` — letter/number → FBX mapping
+- `pose_library.py` — Python module for sign lookup
+- Coverage analysis report
+- Integration test results (10 sentences)
 
-### Estimated Time: 3-5 days
+### Estimated Time: 3–5 days
 
 ---
 
-## Sprint 8: Blender NLA Composition + Interpolation + Render Pipeline
+## Sprint 8: NLA Composition + Interpolation + Multi-Sign Render
 
-**Goal:** Compose multiple signs into a fluid animation with transitions, and render the full sequence.
+**Goal:** Compose multiple signs into a single continuous animation with smooth transitions. Render a full sentence.
 
 ### Tasks
 
-1. **Build NLA composition system**
-   - Function: `compose_signs_nla(armature, sign_actions, transitions)`
-   - For each sign Action: add as NLA strip on a track
-   - Between strips: add transition (blend) — 10-15 frame cross-fade
-   - Use Blender NLA API: `bpy.context.object.animation_data.nla_tracks`
-   - Strip blending mode: `action_blend_type='LINEAR'` or custom curve
-   - Alternative approach: single Action with all keyframes + interpolated transitions
+1. **Build NLA composition script (`nla_composer.py`)**
+   - Function: `compose_signs(sign_list) → blended_animation`
+   - For each sign:
+     - Import FBX, transfer animation to Galtis rig
+     - Create Action from animation data
+     - Add as NLA strip on Galtis armature
+   - Place strips sequentially on timeline with overlap for blending
+   - Handle: strip start/end frames, blend in/out, repeat modes
 
-2. **Build interpolation engine**
-   - Between sign N end-pose and sign N+1 start-pose:
-     - Extract end-frame pose (all bone rotations) from sign N
-     - Extract start-frame pose from sign N+1
-     - Generate 10-15 frame interpolation (linear, ease-in-out, or slerp for rotations)
-     - Insert as keyframes between sign clips
-   - Handle rest pose: signs start/end from a neutral rest pose, so transitions go: sign → rest → sign (more natural than sign → sign directly)
+2. **Interpolation between signs**
+   - **Challenge:** signs end and start at different poses — need smooth transition
+   - Strategy 1: Linear interpolation in blend zone (10-15 frames)
+   - Strategy 2: Savitzky-Golay smoothing across sign boundaries
+   - Strategy 3: Use NLA strip blend settings (Blender built-in)
+   - Test all three, compare visually
+   - **Key:** hands should return to neutral/rest position between signs where natural
+   - Build: `interpolate_strips(strip_a_end, strip_b_start, blend_frames) → keyframes`
 
-3. **Implement Savitzky-Golay temporal smoothing**
-   - Apply to full keyframe sequence after composition
-   - Per-bone, per-rotation-axis: smooth the keyframe value sequence
-   - Window: 7-15 frames (odd), polynomial order 3
-   - Use `scipy.signal.savgol_filter` on extracted keyframe arrays
-   - Re-insert smoothed keyframes
-   - Verify: motion is smooth, no jitter, hands still readable
+3. **Neutral pose handling**
+   - Define: Galtis neutral/rest pose (arms down, hands at sides)
+   - Strategy: insert 5-10 frame neutral pose between signs that end far from next sign's start
+   - Build: `insert_neutral_pose(armature, frame, duration) → keyframes`
+   - This prevents unnatural arm jumps between very different signs
 
-4. **Build full pipeline render script**
-   - `render_pipeline.py`:
-     ```
-     Input: gloss list + output path
-     1. Init scene (load signbridge_scene.blend)
-     2. For each gloss:
-        a. Look up pose source (SignAvatars / ASLLVD / fingerspell)
-        b. Load pose data
-        c. Create Action (keyframes from pose data)
-     3. Compose all Actions as NLA strips
-     4. Add interpolation transitions
-     5. Apply Savitzky-Golay smoothing
-     6. Set render settings (fps, resolution, output format)
-     7. Render animation to MP4
-     8. Save .blend (optional, for debugging)
-     9. Return output path
-     ```
-   - CLI: `blender --background signbridge_scene.blend --python render_pipeline.py -- --glosses HELLO MY NAME KELLEN --output out.mp4`
+4. **Multi-sign render test**
+   - Test sentence: "HELLO MY NAME KELLEN" (4 signs)
+   - Pipeline: gloss lookup → FBX import × 4 → NLA composition → interpolation → render
+   - Target: 8-12 second animation at 30fps (240-360 frames)
+   - Render with Eevee (dev speed)
+   - Quality check: smooth transitions, no popping, natural motion
+   - Measure: total pipeline time (import + compose + render)
 
-5. **Handle fallback signs in Blender**
-   - For ASLLVD 2D fallback: render 2D pose video as plane texture in Blender? Or just concat 2D video after Blender render?
-   - **OPEN QUESTION:** How to handle mixed 3D/2D signs in output? Options:
-     a. Render only 3D signs in Blender, concat 2D signs via ffmpeg
-     b. Project 2D poses onto a plane in Blender scene
-     c. Generate 3D SMPL-X poses from 2D MediaPipe data (uplifting)
-   - For fingerspelling: generate letter-by-letter 3D hand poses (or use pre-rendered clips)
-   - For deictic signs: generate 3D pointing poses (index finger point)
+5. **Longer sequence test**
+   - Test sentence: 8-10 signs (full sentence from POC test set)
+   - Verify: pipeline scales linearly (not exponentially)
+   - Measure: per-sign import time, composition time, render time
+   - Identify: bottlenecks (likely: FBX import per sign, render time)
 
-6. **Performance optimization**
-   - Pre-render common signs to cache (sign video clips)
-   - Compose cached clips + render only transitions
-   - This could reduce render time dramatically (render 10-15 transition frames vs 57 frames per sign)
-   - **OPEN QUESTION:** Cache strategy — per-sign video clips or per-sign .blend Actions?
-
-7. **End-to-end Blender render test**
-   - Input: "Hello, my name is Kellen, I want to tell you about something exciting"
-   - Gloss: HELLO MY NAME K-E-L-L-E-N I WANT TELL YOU ABOUT SOMETHING EXCITING
-   - Render full sequence with transitions and smoothing
-   - Measure total render time
-   - Evaluate output quality
+6. **Temporal smoothing pass**
+   - Apply Savitzky-Golay filter across full animation for joint angles
+   - Window size: 5-7 frames (tunable)
+   - Target: eliminate any remaining jitter from interpolation
+   - Compare: smoothed vs unsmoothed render
 
 ### Deliverables
-- `render_pipeline.py` — Full Blender CLI render script
-- `nla_composer.py` — NLA strip composition module
-- `interpolation.py` — Transition interpolation between signs
-- `smoothing.py` — Savitzky-Golay temporal smoothing
-- Full sequence test render (8+ signs with transitions)
-- Render time benchmarks (per-sign and full-sequence)
-- Quality evaluation: hand shapes, motion fluidity, transition naturalness
+- `nla_composer.py` — NLA strip composition with interpolation
+- `interpolate_strips()` — smooth blend between sign clips
+- Multi-sign render (4-sign sentence) — MP4
+- Longer sequence render (8-10 signs) — MP4
+- Temporal smoothing integration
+- Pipeline timing report
 
-### Estimated Time: 7-10 days
+### Estimated Time: 5–7 days
 
 ---
 
-## Sprint 9: End-to-End Integration + Quality Evaluation
+## Sprint 9: End-to-End Pipeline Integration + Quality Eval
 
-**Goal:** Wire the new Blender pipeline into the FastAPI service, evaluate quality against commercial products.
+**Goal:** Wire everything together. Audio in → ASL video out. Full automated pipeline.
 
 ### Tasks
 
-1. **Integrate Blender pipeline into FastAPI**
-   - Update `pipeline.py`:
-     - Audio → Whisper → LLM → Gloss (unchanged)
-     - Gloss → pose source resolution (SignAvatars / ASLLVD / fingerspell)
-     - Pose data → Blender subprocess → render video
-     - Optional: Blender render → Dreamactor polish
-   - Blender called as subprocess: `subprocess.run(["blender", "--background", ...])`
-   - Async processing with progress updates
-   - Job status: ...rendering... (new status)
-   - Handle Blender errors (crash, timeout, missing .pkl)
+1. **Build pipeline orchestrator (`signbridge_pipeline.py`)**
+   - Input: audio file path
+   - Steps:
+     1. Whisper transcription (reuse POC module)
+     2. LLM gloss translation (reuse POC module)
+     3. Gloss → StudioGalt FBX lookup (Sprint 7 module)
+     4. Blender headless render (Sprint 6+8 modules)
+     5. Optional: Dreamactor polish (reuse POC module)
+   - Output: final MP4 video
+   - CLI: `python signbridge_pipeline.py --input audio.mp3 --output video.mp4`
+   - API: integrate with existing FastAPI service
 
-2. **Update API endpoints**
-   - POST /api/jobs — accept audio, start pipeline
-   - GET /api/jobs/{id} — include render progress, pose sources
-   - GET /api/jobs/{id}/video — serve rendered video
-   - GET /api/stats — include 3D library stats, render time averages
-   - New: GET /api/jobs/{id}/blend — download .blend file (debugging)
+2. **FastAPI integration**
+   - Update `/api/jobs` endpoint to use new Blender pipeline
+   - Add: Blender render job status (importing, composing, rendering, done)
+   - Add: render progress (frame X of Y)
+   - Update dashboard: show Blender render preview/thumbnail
+   - Handle: Blender process management (subprocess, timeout, error handling)
 
-3. **Update dashboard**
-   - New pipeline diagram (3D flow)
-   - Render progress indicator
-   - 3D vs 2D pose source distribution chart
-   - Sample 3D render videos
-   - Sprint 9 demo section
-   - Comparison: old pipeline vs new pipeline
+3. **Quality evaluation**
+   - Test set: 20 audio clips (varying length, vocabulary)
+   - For each:
+     - Run full pipeline
+     - Record: gloss hit rate, render time, output quality
+     - Manual review: does the signing look correct? (Kellen or ASL-literate reviewer)
+   - Metrics:
+     - End-to-end time: target <60s for 10-second clip
+     - Coverage: target 85%+ gloss hit rate
+     - Quality: subjective 1-5 scale (motion, transitions, expressions)
+     - Failure modes: what breaks? missing signs? render errors?
 
-4. **Quality evaluation**
-   - Render same test sentences with both pipelines (2D vs 3D)
-   - Compare:
-     - Hand shape accuracy (can ASL-literate viewer read the signs?)
-     - Motion fluidity (transitions, smoothing)
-     - Visual quality (lighting, materials, framing)
-     - Render time
-   - Compare against commercial ASL products:
-     - **OPEN QUESTION:** Which commercial products to compare against? (e.g., SignAll, OmniBridge, Avatar ASL)
-   - Gather feedback from ASL-literate reviewers if possible
+4. **Optimization pass**
+   - Identify: slowest pipeline steps
+   - Optimize: FBX import (cache imported actions? pre-import common signs?)
+   - Optimize: render settings (lower samples for dev, higher for final)
+   - Optimize: scene loading (load base scene once, reuse across renders)
+   - Target: <60s total for 10-second clip at dev quality
 
-5. **Dreamactor evaluation (optional)**
-   - Take best Blender render → run through Dreamactor
-   - Compare: Blender-only vs Blender+Dreamactor
-   - Decide: is Dreamactor worth the cost + time?
-   - If yes: wire Dreamactor as optional post-processing step
-   - If no: mark Dreamactor as deprecated for v2 pipeline
+5. **Error handling + edge cases**
+   - Missing FBX file → graceful fallback to fingerspell
+   - Blender crash → retry with simpler scene, log error
+   - Empty gloss sequence → return error message
+   - Very long audio (>30s) → chunk and concatenate renders
+   - Signs with no animation data → skip with warning
 
-6. **Performance optimization pass**
-   - Profile render pipeline: where is time spent?
-   - Optimize: reduce samples, simplify materials, lower resolution if needed
-   - Test cache strategy: pre-rendered sign clips vs full render
-   - Target: <2 min for 30 sec audio
+6. **Documentation**
+   - Update `passoff.md` with final pipeline state
+   - Update README with setup + run instructions
+   - Document: Blender install, StudioGalt download, config settings
+   - Document: known limitations, future improvements
 
 ### Deliverables
-- Updated `pipeline.py` with Blender integration
-- Updated API + dashboard
-- Quality evaluation report (2D vs 3D vs commercial)
-- Performance benchmarks (optimized pipeline)
-- Decision document: Dreamactor yes/no
-- Sprint 9 demo on dashboard
+- `signbridge_pipeline.py` — full pipeline orchestrator
+- Updated FastAPI service with Blender integration
+- Quality evaluation report (20 clips)
+- Optimized pipeline (<60s target)
+- Updated documentation
 
-### Estimated Time: 5-7 days
+### Estimated Time: 5–7 days
 
 ---
 
-## Sprint 10: Jev Integration for Constrained Gloss Decoding
+## Sprint 10: Jev Constrained Decoding + Polish
 
-**Goal:** Replace LLM rephrasing with Jev (TypeSafe AI) for constrained, hallucination-free gloss matching.
+**Goal:** Integrate Jev for structured gloss output. Polish the pipeline for production use.
 
 ### Tasks
 
-1. **Set up OpenRouter Decisions API**
-   - Verify OpenRouter API key in `~/.openclaw/credentials/`
-   - Test Jev endpoint: `POST https://openrouter.ai/api/alpha/decisions`
-   - Model: `typesafe/jev-1.13`
-   - Format: `state` (text to translate) + `questions` (typed: choice, noul, score)
+1. **Jev constrained decoding integration**
+   - Jev: structured output decoder for LLMs
+   - Configure: grammar/constraint file for ASL gloss format
+   - Target: eliminate invalid gloss outputs from LLM
+   - Integration: replace free-form LLM gloss with Jev-constrained gloss
+   - Test: does Jev work with Gemma4:cloud via Ollama? Check Ollama structured output support
+   - Fallback: if Jev not compatible, use JSON mode or regex-based post-processing
 
-2. **Design Jev question schema for gloss matching**
-   - **Choice question:** "Which ASL gloss matches this English word?"
-     - Criteria: list of available glosses (or subset for vocabulary)
-     - Returns: probability distribution over glosses
-   - **Noul question:** "Translate this sentence to ASL gloss sequence"
-     - Returns: structured gloss output
-   - **Score question:** "Is this gloss translation accurate? (0-1)"
-     - Returns: confidence score for validation
+2. **Gloss format standardization**
+   - Define: canonical gloss format (e.g., "MOTHER^1", "IX-1p", "POSS-1p")
+   - Update: gloss → StudioGalt mapping to handle canonical format
+   - Update: LLM prompt to output canonical glosses
+   - Test: improved gloss accuracy and lookup hit rate
 
-3. **Build Jev gloss matcher**
-   - Input: English word/phrase + available glosses
-   - Output: best-matching gloss + confidence
-   - Batch: send multiple words per call (shared state, multiple questions)
-   - Cache: store results to avoid repeat API calls
-   - Fallback: if Jev confidence < threshold, use LLM rephrase or fingerspell
+3. **Facial expressions (FACS shapekeys)**
+   - StudioGalt includes FACS shapekeys on Galtis rig
+   - Map: ASL non-manual markers → FACS shapekey activation
+   - Examples: raised eyebrows for yes/no questions, furrowed brows for WH-questions
+   - Implement: keyframe shapekey values based on sentence type
+   - This is a first pass — full non-manual grammar is future work
 
-4. **Integrate Jev into pipeline**
-   - Replace `llm_rephrase_and_map()` in `pipeline.py`
-   - Jev handles: English → ASL grammar rephrase → gloss selection
-   - Constrained: Jev can only output glosses from our vocabulary (no hallucinations)
-   - Track: Jev confidence per gloss, low-confidence glosses flagged
+4. **Avatar consideration (OPEN)**
+   - Decision needed: keep Galtis (female) or create/find male avatar?
+   - If male needed: explore Mixamo-compatible rig variant, or find male character model that works with Galtis armature
+   - For now: proceed with Galtis, revisit if needed
 
-5. **Accuracy comparison: Jev vs LLM**
-   - Test with same sentences used in Sprint 2
-   - Compare gloss match rates:
-     - LLM (Gemma4:cloud): 76% (current baseline)
-     - Jev: target 85%+
-   - Test with edge cases:
-     - Proper nouns (should fingerspell)
-     - Idioms (should rephrase to available signs)
-     - ASL-specific grammar (topic-comment structure, wh-questions)
+5. **Render quality polish**
+   - Final render settings: Cycles, higher samples, better lighting
+   - Optional: ambient occlusion, subsurface scattering on skin
+   - Optional: background environment (simple studio backdrop)
+   - Render: 1080p final output (up from 720p dev)
 
-6. **Update pipeline configuration**
-   - Config: `GLOSS_MATCHER = "jev" | "llm" | "hybrid"`
-   - Hybrid mode: Jev primary, LLM fallback for low-confidence
-   - Log: matcher used per gloss, confidence, time taken
+6. **Dreamactor integration test**
+   - Take 3 best Blender renders
+   - Run through Dreamactor v2 polish
+   - Compare: Blender-only vs Blender + Dreamactor
+   - Decision: is Dreamactor still needed? Blender quality may be sufficient
+   - If yes: integrate as optional post-processing step
 
-7. **Update dashboard**
-   - Show matcher type (Jev/LLM/hybrid) in job details
-   - Gloss match accuracy stats
-   - Jev vs LLM comparison chart
+7. **Final pipeline test**
+   - 5 diverse audio clips (different lengths, vocabulary, sentence types)
+   - Full pipeline: audio → final video
+   - Record: timing, quality, failures
+   - Get Kellen's review: is this usable for real content?
 
 ### Deliverables
-- `jev_gloss_matcher.py` — Jev integration module
-- Updated `pipeline.py` with Jev/hybrid matcher
-- Accuracy comparison report (Jev vs LLM)
-- Updated dashboard with matcher stats
-- Sprint 10 demo
+- Jev constrained decoding integrated (or alternative structured output)
+- Canonical gloss format defined and working
+- FACS facial expression first pass
+- Final render quality settings
+- Dreamactor integration decision
+- 5-clip final pipeline test results
+- Kellen review: GO / NO-GO for production use
 
-### Estimated Time: 5-7 days
+### Estimated Time: 5–7 days
 
 ---
 
 ## Sprint Summary
 
-| Sprint | Goal | Est. Time | Key Deliverable |
-|--------|------|-----------|-----------------|
-| 5 | Data access + Blender install | 3-5 days | SignAvatars data + Blender headless working |
-| 6 | SMPL-X → Blender rig pipeline | 5-7 days | Single sign 3D render |
-| 7 | Gloss mapping + pose library | 3-5 days | 85%+ coverage with 3D poses |
-| 8 | NLA composition + render pipeline | 7-10 days | Full sequence 3D render with transitions |
-| 9 | E2E integration + quality eval | 5-7 days | Updated API + quality report |
-| 10 | Jev integration | 5-7 days | Constrained gloss matching, 85%+ accuracy |
+| Sprint | Goal | Est. Time | Status |
+|--------|------|-----------|--------|
+| 5 | StudioGalt download + Blender install + headless test + FBX import | 3–5 days | PLANNING |
+| 6 | Galtis rig scene setup + camera + lighting + first render | 5–7 days | PLANNING |
+| 7 | Gloss → StudioGalt mapping + pose library build | 3–5 days | PLANNING |
+| 8 | NLA composition + interpolation + multi-sign render | 5–7 days | PLANNING |
+| 9 | End-to-end pipeline integration + quality eval | 5–7 days | PLANNING |
+| 10 | Jev constrained decoding + polish | 5–7 days | PLANNING |
 
-**Total estimated time: 28-41 days (4-6 weeks)**
-
----
-
-## Dependencies & Blockers
-
-1. **SignAvatars access** (Sprint 5) — Google Form approval required. Could take days.
-2. **Blender GPU support** (Sprint 5) — AMD 5500M Metal support unknown. If no GPU, CPU render times acceptable but slower.
-3. **SMPL-X model files** (Sprint 5) — Need SMPL-X model files from smpl-x.is.tue.mpg.de (free academic license) or Dropbox link in SignAvatars repo.
-4. **OpenRouter key** (Sprint 10) — Kellen needs to verify/add API key.
-5. **Watchtower performance** — Intel i9, 32GB RAM. Blender CPU rendering should work but may be slow. GPU uncertain.
+**Total estimated time:** 26–38 days (4–7 weeks)
+**Target:** Working SignBridge USABILITY pipeline by end of Sprint 10
 
 ---
 
-## Risk Mitigation
+## Dependencies
 
-| Risk | Mitigation |
-|------|------------|
-| SignAvatars access denied | Fall back to ASLLVD + uplift 2D to pseudo-3D, or find alternative 3D ASL datasets |
-| No GPU rendering on Watchtower | Use cloud GPU (RunPod, Modal) for rendering, or accept CPU render times |
-| WLASL coverage too low | Use How2Sign subset for additional signs, or retain ASLLVD 2D for larger coverage |
-| Blender too slow for production | Pre-render sign library to video clips, compose only transitions |
-| SMPL-X add-on incompatible with Blender version | Use tested Blender 3.1.0, or patch add-on for newer versions |
-| Non-commercial license blocks commercial use | Contact Tencent for commercial license, or use only open-license data |
+- **Sprint 5 → 6:** Need Blender installed + FBX import working before scene setup
+- **Sprint 6 → 7:** Need render pipeline working before building lookup (can start mapping in parallel)
+- **Sprint 7 → 8:** Need pose library before multi-sign composition
+- **Sprint 8 → 9:** Need NLA composition before end-to-end integration
+- **Sprint 9 → 10:** Need working pipeline before polish
+
+**Parallelizable:** Sprint 7 (gloss mapping) can start during Sprint 6 (scene setup) since it's mostly data work, not Blender work.
