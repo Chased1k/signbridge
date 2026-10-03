@@ -11,13 +11,12 @@ The full StudioGalt archive was cloned, Blender LTS was installed, the rig and a
 | --- | --- |
 | StudioGalt clone | Complete |
 | Blender LTS install / CLI / Python | Complete |
-| Minimal Eevee render | Blocked in AMD Metal driver; no PNG |
-| Cycles CPU comparison | Blocked because Blender cannot initialize its required draw/Metal context |
-| Galtis rig inspection | Complete |
-| Galtis T-pose render | Blocked by the same Metal stall; no PNG |
-| No Mesh Full FBX import/inspection | Complete |
-| Animated-frame render | Blocked by the same Metal stall; no PNG |
-| Sign index | Complete |
+| Minimal Cycles CPU render | ✅ Complete — 512×512 PNG in 1.5s |
+| Galtis rig inspection | ✅ Complete |
+| Galtis T-pose render | ✅ Complete — 512×512 PNG in 2.5s (Cycles CPU, 64 samples) |
+| No Mesh Full FBX import/inspection | ✅ Complete |
+| Animated-frame render | ✅ Complete — 512×512 PNG in 2.5s (Cycles CPU, 64 samples) |
+| Sign index | ✅ Complete |
 
 ## 1. StudioGalt archive
 
@@ -188,6 +187,18 @@ FBX coverage:
 
 Each sign is grouped by normalized sign name and contains its variant label, alt number, normalized ISO date (or `null` when absent), letter directory, source directory, and project-relative paths for all four FBX variants. Nested `FBX Files/` directories are handled recursively.
 
-## Remaining blocker
+## Render results (Cycles CPU — no reboot needed)
 
-A host reboot is required to clear the four AMD-driver-blocked Blender processes. After reboot, run the four completion commands in section 3 and verify the three expected PNGs. The requested `openclaw` completion event was intentionally not emitted during this run because the render outputs do not yet exist.
+The Eevee/Metal GPU path hangs in an uninterruptible AMD driver wait. Switching all scripts to **Cycles CPU** bypasses the GPU entirely and renders successfully:
+
+| Test | Resolution | Samples | Time | Output |
+| --- | ---: | ---: | ---: | --- |
+| Minimal cube | 512×512 | 32 | 1.5s | `/tmp/signbridge_test_render_cycles.png` |
+| Galtis T-pose | 512×512 | 64 | 2.5s | `output/galtis_tpose_test.png` |
+| FBX import (Anymore, frame 124) | 512×512 | 64 | 2.5s | `output/fbx_import_test.png` |
+
+Cycles CPU is sufficient for headless pipeline rendering. Eevee would be faster but requires the AMD Metal driver to recover (likely needs macOS reboot or GPU reset). The Galtis .blend was saved by Blender 5.1.29 — opens in 4.5.14 with a compatibility warning but functions correctly.
+
+## Remaining notes
+
+The 4 zombie Blender processes from the original Eevee attempts (PIDs 70118, 70536, 71755, 72982) are in `?E` (exiting) state and harmless. One process (75947) remained in `U` state but does not interfere with new Cycles CPU renders.
