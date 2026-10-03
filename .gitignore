@@ -34,3 +34,6 @@ Thumbs.db
 *.pth
 *.onnx
 *.pt
+
+# Blender backup files
+*.blend1

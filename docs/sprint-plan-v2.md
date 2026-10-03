@@ -2,8 +2,8 @@
 
 > **Phase:** USABILITY — 3D motion capture + Blender pipeline
 > Created: 2026-10-01
-> Updated: 2026-10-01
-> Status: PLANNING
+> Updated: 2026-10-02
+> Status: SPRINT 6 COMPLETE
 > Dataset: StudioGalt Sign Language Mocap Archive (CC0)
 
 ---
@@ -71,7 +71,7 @@
 
 ---
 
-## Sprint 6: Galtis Rig Scene Setup + Camera + Lighting + First Render Test
+## Sprint 6: Galtis Rig Scene Setup + Camera + Lighting + First Render Test — ✅ DONE (2026-10-02)
 
 **Goal:** Build the base Blender scene with camera, lighting, and render configuration. Produce the first animated sign render.
 
@@ -84,7 +84,7 @@
    - 3-point lighting setup: key, fill, backlight (scriptable via Python)
    - Background: solid color or simple gradient (green screen option for later compositing)
    - Set render settings: resolution (720p target), frame rate (30fps), output format (PNG sequence or MP4)
-   - Set render engine: Eevee (default for dev), Cycles (option for quality)
+   - Set render engine: Cycles CPU only (32-sample dev, 64-sample standard)
 
 2. **Build FBX import + retarget script (`sign_importer.py`)**
    - Function: `import_sign_fbx(filepath) → armature, action`
@@ -96,7 +96,7 @@
    - If rigs are identical (same source): direct transfer should work
 
 3. **Build animation transfer script**
-   - Function: `transfer_animation(source_armature, target_armature, action, frame_range)`
+   - Function: `transfer_animation(target_armature, retargeted_action, frame_range)`
    - Copy animation data from imported FBX armature to Galtis deform rig
    - Handle: root motion, body joints, hand bones, facial shapekeys
    - Test: import "HELLO" FBX, transfer to Galtis, render animation
@@ -110,8 +110,8 @@
    - Quality check: does the motion look correct? Compare to .mkv preview
 
 5. **Render optimization**
-   - Test Eevee render settings: samples, resolution scale, tile size
-   - Test Cycles (CPU) for quality comparison — is it viable for dev iteration?
+   - Test Cycles CPU at 32/64/128 samples and 50%/100% resolution
+   - Compare development, standard, and quality render costs
    - Determine: fastest acceptable render config for development
    - Determine: quality render config for final output
    - Record: render time per frame, per second of animation
@@ -125,7 +125,7 @@
 ### Deliverables
 - `setup_scene.py` — camera, lighting, render config
 - `sign_importer.py` — FBX import + bone retargeting
-- `render_pipeline.py` (initial) — orchestrator: load → import → transfer → render
+- `render_sign.py` — orchestrator: load → import → transfer → render
 - First animated sign render (MP4)
 - Render time benchmarks and recommended settings
 - Batch render test (3 signs)
@@ -231,7 +231,7 @@
    - Test sentence: "HELLO MY NAME KELLEN" (4 signs)
    - Pipeline: gloss lookup → FBX import × 4 → NLA composition → interpolation → render
    - Target: 8-12 second animation at 30fps (240-360 frames)
-   - Render with Eevee (dev speed)
+   - Render with Cycles CPU at the 32-sample development setting
    - Quality check: smooth transitions, no popping, natural motion
    - Measure: total pipeline time (import + compose + render)
 
@@ -395,9 +395,9 @@
 
 | Sprint | Goal | Est. Time | Status |
 |--------|------|-----------|--------|
-| 5 | StudioGalt download + Blender install + headless test + FBX import | 3–5 days | PLANNING |
-| 6 | Galtis rig scene setup + camera + lighting + first render | 5–7 days | PLANNING |
-| 7 | Gloss → StudioGalt mapping + pose library build | 3–5 days | PLANNING |
+| 5 | StudioGalt download + Blender install + headless test + FBX import | 3–5 days | ✅ DONE |
+| 6 | Galtis rig scene setup + camera + lighting + first render | 5–7 days | ✅ DONE |
+| 7 | Gloss → StudioGalt mapping + pose library build | 3–5 days | NEXT |
 | 8 | NLA composition + interpolation + multi-sign render | 5–7 days | PLANNING |
 | 9 | End-to-end pipeline integration + quality eval | 5–7 days | PLANNING |
 | 10 | Jev constrained decoding + polish | 5–7 days | PLANNING |

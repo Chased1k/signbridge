@@ -83,7 +83,7 @@ Audio → Whisper → LLM/Jev → Gloss Sequence
                         ├── NLA strip composition (sequential signs)
                         ├── Interpolation between sign clips (10-15 frame blends)
                         ├── Camera + 3-point lighting setup
-                        └── Render to MP4 (Eevee fast / Cycles quality)
+                        └── Render to MP4 (Cycles CPU; 32-sample dev / 64-sample standard)
                                     ↓
                         [Optional] Dreamactor Polish
                         (Blender render → photorealistic pass)
@@ -98,7 +98,7 @@ Audio → Whisper → LLM/Jev → Gloss Sequence
 | Pose data | 2D MediaPipe (75 keypoints) | 3D mocap FBX (Xsens + StretchSense) |
 | Dataset | ASLLVD (2,589 glosses) | StudioGalt (2,587 signs, CC0) |
 | Composition | ffmpeg concat (hard cuts) | Blender NLA + interpolation (smooth) |
-| Rendering | ffmpeg (2D skeleton) | Blender Eevee/Cycles (3D character) |
+| Rendering | ffmpeg (2D skeleton) | Blender Cycles CPU (3D character) |
 | Facial | None | FACS shapekeys (Galtis rig) |
 | Hands | 2D keypoints | StretchSense mocap (3D finger data) |
 | Quality | 2D stick figure | 3D animated character |
@@ -125,8 +125,8 @@ Audio → Whisper → LLM/Jev → Gloss Sequence
 | 3 | Whisper + end-to-end + GitHub | ✅ DONE | 3.3s pipeline, repo pushed |
 | 4 | POC complete + Dreamactor test | ✅ DONE | POC declared complete |
 | 5 | StudioGalt download + Blender install + headless test + FBX import + sign index | ✅ DONE | 2,586 signs indexed, 145GB, Blender 4.5.14 LTS, Cycles CPU working, 114/116 bones mapped, 3 test renders |
-| 6 | Galtis rig scene setup + camera + lighting + first render | 🔲 NEXT | Dashboard needs cleanup — remove Sprint 4 content, make it a narrative |
-| 7 | Gloss → StudioGalt mapping + pose library | 🔲 PLANNING | Parallelizable with Sprint 6 |
+| 6 | Galtis rig scene setup + camera + lighting + first render | ✅ DONE | 720p Hello MP4, three render benchmarks, five-FBX importer test, three-sign batch |
+| 7 | Gloss → StudioGalt mapping + pose library | 🔲 NEXT | Build direct/synonym/lemma mapping and fingerspelling fallback |
 | 8 | NLA composition + interpolation + multi-sign render | 🔲 PLANNING | |
 | 9 | End-to-end pipeline integration + quality eval | 🔲 PLANNING | |
 | 10 | Jev constrained decoding + polish | 🔲 PLANNING | |
@@ -141,7 +141,7 @@ Audio → Whisper → LLM/Jev → Gloss Sequence
 2. **Gloss → sign name mapping** — StudioGalt uses English words, not glosses. How to bridge?
 3. **Missing signs** — Signs not in StudioGalt? Fallback: fingerspell. Later: SignAvatars supplement.
 4. **FBX retargeting automation** — Can bone mapping be fully scripted? Per-sign or uniform?
-5. **Render speed on Watchtower** — Intel i9 + AMD 5500M. Eevee via Metal? Cycles CPU-only?
+5. **Render scaling** — Cycles CPU is confirmed; Sprint 6 measured 1.884s/still at dev settings and 9.983s/animated frame at standard settings.
 6. **Galtis rig complexity** — FK/IK + intermediate + deform + correction bones. Simplify for speed?
 7. **Frame rate** — 240fps recorded / 60fps posted. Output at 30fps or 60fps?
 8. **Animation retargeting** — Is FBX armature identical across all signs? Or per-sign mapping needed?
@@ -163,13 +163,13 @@ Audio → Whisper → LLM/Jev → Gloss Sequence
 - StudioGalt Sign Language Mocap Archive (CC0)
 - Blender Python API (bpy)
 - NLA composition + interpolation
-- Eevee (fast render) / Cycles (quality render)
+- Cycles CPU (32-sample dev / 64-sample standard / 128-sample quality)
 - Same: Whisper, Ollama, FastAPI, Cloudflare Tunnel
 
 ### Hardware
 - **Watchtower:** Intel i9, AMD 5500M, macOS Sonoma
-- **Eevee:** GPU-accelerated via Metal (macOS)
-- **Cycles:** CPU-only (no NVIDIA/OptiX on macOS)
+- **Eevee:** disabled; AMD Metal initialization stalls on this host
+- **Cycles:** CPU-only (stable; no NVIDIA/OptiX on macOS)
 
 ---
 
@@ -212,6 +212,20 @@ Audio → Whisper → LLM/Jev → Gloss Sequence
 
 ---
 
+## Sprint 6 Results (Completed Oct 2, 2026)
+
+- Added reusable scene setup with a 50 mm medium camera, three-point area lighting, dark-gray background, and `--greenscreen`.
+- Added reusable No Mesh Full importer, bone remapping, Blender action-slot binding, constraint-aware transfer, and 60→30 fps action retiming.
+- Validated five different signs: Hello, Biological Mother, Please, Anymore, and Born Again.
+- Rendered `output/first_sign_render.mp4`: Hello, H.264, 1280×720, 30 fps, 67 frames/2.233s.
+- Standard full-animation render: 668.860s, 9.983s/frame, 672.999s total pipeline time.
+- Still benchmarks: 1.884s at 360p/32 samples, 5.322s at 720p/64, and 9.261s at 720p/128.
+- Batch rendered Hello, Biological Mother, and Please after one base-scene load: 237 frames in 686.311s.
+- Cycles CPU remains the only supported renderer on this Mac; Eevee/AMD Metal is not used.
+- Detailed reports: `docs/sprint6-results.md`, `docs/sprint6-render-benchmarks.md`, and `docs/sprint6-batch-test.md`.
+
+---
+
 ## Next Action
 
-**Sprint 6:** Galtis rig scene setup — camera, 3-point lighting, background, first multi-frame animation render. Also: clean up dashboard to tell the project story (Sprint 1→5 journey + where we're going).
+**Sprint 7:** Build the gloss → StudioGalt mapping and pose-library layer, including alt selection, coverage analysis, and fingerspelling fallback.

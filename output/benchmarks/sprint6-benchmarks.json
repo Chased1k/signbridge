@@ -1,0 +1,33 @@
+{
+  "sign": "Hello",
+  "fbx": "/Users/watchtower/projects/signbridge/data/studiogalt/SG ASL Dictionary/ASL H/SG ASL Hello 2024-6-9 Upload/FBX Files/Research/SG ASL Hello 2024-6-9 No Mesh Full.fbx",
+  "results": [
+    {
+      "label": "dev_360p_32",
+      "engine": "Cycles CPU",
+      "samples": 32,
+      "resolution": "640x360",
+      "frame": 67,
+      "seconds": 1.884,
+      "output": "output/benchmarks/dev_360p_32.png"
+    },
+    {
+      "label": "standard_720p_64",
+      "engine": "Cycles CPU",
+      "samples": 64,
+      "resolution": "1280x720",
+      "frame": 67,
+      "seconds": 5.322,
+      "output": "output/benchmarks/standard_720p_64.png"
+    },
+    {
+      "label": "quality_720p_128",
+      "engine": "Cycles CPU",
+      "samples": 128,
+      "resolution": "1280x720",
+      "frame": 67,
+      "seconds": 9.261,
+      "output": "output/benchmarks/quality_720p_128.png"
+    }
+  ]
+}
