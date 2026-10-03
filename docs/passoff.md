@@ -1,7 +1,7 @@
 # SignBridge — Project Passoff Document
 
 > Created: 2026-10-01 07:10 MST
-> Updated: 2026-10-01 17:52 MST
+> Updated: 2026-10-02 21:12 MST
 > Purpose: Full context handoff for session continuity
 
 ---
@@ -124,8 +124,8 @@ Audio → Whisper → LLM/Jev → Gloss Sequence
 | 2 | Translation pipeline + FastAPI service | ✅ DONE | 76% hit rate, dashboard live |
 | 3 | Whisper + end-to-end + GitHub | ✅ DONE | 3.3s pipeline, repo pushed |
 | 4 | POC complete + Dreamactor test | ✅ DONE | POC declared complete |
-| 5 | StudioGalt download + Blender install + headless test + FBX import | 🔲 PLANNING | First USABILITY sprint |
-| 6 | Galtis rig scene setup + camera + lighting + first render | 🔲 PLANNING | |
+| 5 | StudioGalt download + Blender install + headless test + FBX import + sign index | ✅ DONE | 2,586 signs indexed, 145GB, Blender 4.5.14 LTS, Cycles CPU working, 114/116 bones mapped, 3 test renders |
+| 6 | Galtis rig scene setup + camera + lighting + first render | 🔲 NEXT | Dashboard needs cleanup — remove Sprint 4 content, make it a narrative |
 | 7 | Gloss → StudioGalt mapping + pose library | 🔲 PLANNING | Parallelizable with Sprint 6 |
 | 8 | NLA composition + interpolation + multi-sign render | 🔲 PLANNING | |
 | 9 | End-to-end pipeline integration + quality eval | 🔲 PLANNING | |
@@ -188,12 +188,30 @@ Audio → Whisper → LLM/Jev → Gloss Sequence
 
 ---
 
+## Sprint 5 Results (Completed Oct 2, 2026)
+
+- **StudioGalt cloned:** 145GB, 2,586 signs, 4 FBX variants per sign
+- **Sign index built:** 2.4MB JSON, 257 signs with multiple variants, date-sorted (newest = best quality)
+- **Blender 4.5.14 LTS** installed via `brew install --cask blender`
+- **Cycles CPU rendering** confirmed working (AMD Metal driver crashes bypassed — CPU-only is stable)
+- **Bone mapping:** 114/116 FBX bones mapped to Galtis rig (2 minor finger bones unmapped — non-blocking)
+- **Test renders:**
+  - Minimal cube test (512², 32 samples, 1.5s) — Cycles CPU baseline
+  - Galtis rig T-pose (512², 64 samples, 2.5s) — character renders correctly
+  - "Anymore" sign FBX animation (512², 64 samples, 2.5s) — motion capture retargeted and rendered
+- **Dashboard:** signbridge.wdfab.io updated with Sprint 5 section (needs cleanup — Sprint 4 content stale)
+- **Key discovery:** Blender CLI `--background --python` works well. Each sign FBX imports, retargets to Galtis armature via bone mapping, and renders in ~2.5s/frame at 512² on CPU.
+
+### Sprint 5 Stats
+- Signs indexed: 2,586
+- FBX variants: 4 per sign (Mesh, No Mesh Full, No Mesh Mini, No Mesh Mixamo)
+- Galtis rig: 405 bones, 71 FACS shapekeys
+- Bone mapping: 114/116 (98.3%)
+- Render time: 2.5s/frame at 512², 64 samples, Cycles CPU
+- Archive size: 145GB on disk
+
+---
+
 ## Next Action
 
-**Sprint 5, Task 1:** Download StudioGalt repository and install Blender on Watchtower.
-
-```
-git clone https://github.com/StudioGalt/Sign-Language-Mocap-Archive.git
-# Install Blender LTS for macOS Intel
-# Test: blender --background --python-expr "import bpy; print(bpy.app.version)"
-```
+**Sprint 6:** Galtis rig scene setup — camera, 3-point lighting, background, first multi-frame animation render. Also: clean up dashboard to tell the project story (Sprint 1→5 journey + where we're going).
