@@ -176,15 +176,15 @@ footer { text-align: center; padding: 32px 0; color: var(--muted); font-size: 0.
 <div class="hero">
   <h1>🐴 SignBridge</h1>
   <p>Speech → ASL Signer Video. On-demand, expressive, accessible.</p>
-  <div class="badge">POC Sprint 4 · 2,589 signs · Whisper + MediaPipe + synthetic deictic · fal.ai Dreamactor LIVE · Jev-ready post-POC</div>
+  <div class="badge">Sprint 5 · 3D Mocap Upgrade · StudioGalt 2,586 signs + Blender Cycles CPU · POC COMPLETE</div>
 </div>
 
 <!-- Stats -->
 <div class="stats-grid" id="statsGrid">
-  <div class="stat-card"><div class="label">Pose Library</div><div class="value" id="statGlosses">—</div><div class="sub">ASLLVD glosses extracted</div></div>
-  <div class="stat-card"><div class="label">Coverage</div><div class="value">94.2%</div><div class="sub">2,589 / 2,746 glosses + 20 deictic</div></div>
-  <div class="stat-card"><div class="label">Signers</div><div class="value">6+</div><div class="sub">Brady, Dana, Lana, Liz, Naomi, Tyler + synthetic</div></div>
-  <div class="stat-card"><div class="label">Jobs Run</div><div class="value" id="statJobs">—</div><div class="sub">total pipeline runs</div></div>
+  <div class="stat-card"><div class="label">Pose Library</div><div class="value" id="statGlosses">2,586</div><div class="sub">StudioGalt 3D mocap signs</div></div>
+  <div class="stat-card"><div class="label">Coverage</div><div class="value">2,200</div><div class="sub">No Mesh Full FBX files</div></div>
+  <div class="stat-card"><div class="label">Render Engine</div><div class="value">Cycles CPU</div><div class="sub">Blender 4.5.14 LTS · 2.5s/frame</div></div>
+  <div class="stat-card"><div class="label">Rig</div><div class="value">405 bones</div><div class="sub">Galtis 8 · 71 FACS expressions</div></div>
 </div>
 
 <!-- Pipeline diagram -->
@@ -195,11 +195,11 @@ footer { text-align: center; padding: 32px 0; color: var(--muted); font-size: 0.
   <div class="pipe-arrow">→</div>
   <div class="pipe-step"><div class="icon">🧠</div><div class="name">LLM Rephrase</div><div class="desc">English → ASL grammar</div></div>
   <div class="pipe-arrow">→</div>
-  <div class="pipe-step"><div class="icon">🔤</div><div class="name">Gloss Match</div><div class="desc">deterministic lookup</div></div>
+  <div class="pipe-step"><div class="icon">🔤</div><div class="name">Sign Lookup</div><div class="desc">StudioGalt index</div></div>
   <div class="pipe-arrow">→</div>
-  <div class="pipe-step"><div class="icon">🎬</div><div class="name">Pose Stitch</div><div class="desc">ffmpeg concat</div></div>
+  <div class="pipe-step"><div class="icon">🦴</div><div class="name">FBX Retarget</div><div class="desc">Blender bone map</div></div>
   <div class="pipe-arrow">→</div>
-  <div class="pipe-step"><div class="icon">✨</div><div class="name">fal.ai</div><div class="desc">photorealistic polish</div></div>
+  <div class="pipe-step"><div class="icon">🎬</div><div class="name">Blender Render</div><div class="desc">Cycles CPU</div></div>
 </div>
 
 <div class="cols">
@@ -422,6 +422,62 @@ footer { text-align: center; padding: 32px 0; color: var(--muted); font-size: 0.
   </div>
 </div>
 
+<!-- Sprint 5: 3D Mocap Upgrade -->
+<div class="panel" style="margin-bottom: 24px;">
+  <h2>🎬 Sprint 5 — 3D Motion Capture Upgrade (StudioGalt + Blender)</h2>
+  <p style="color: var(--muted); font-size: 0.85rem; margin-bottom: 16px;">POC complete. Upgrading from 2D MediaPipe poses to 3D motion capture using StudioGalt archive (CC0) + Blender headless rendering. Cycles CPU — no GPU required.</p>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+    <div style="background: var(--surface2); border-radius: 10px; padding: 20px; border: 1px solid var(--border);">
+      <div style="font-size: 1.8rem; font-weight: 700; color: var(--accent2);">2,586</div>
+      <div style="font-size: 0.8rem; color: var(--muted); margin-top: 4px;">StudioGalt signs (CC0)</div>
+    </div>
+    <div style="background: var(--surface2); border-radius: 10px; padding: 20px; border: 1px solid var(--border);">
+      <div style="font-size: 1.8rem; font-weight: 700; color: var(--accent2);">405</div>
+      <div style="font-size: 0.8rem; color: var(--muted); margin-top: 4px;">Galtis rig bones</div>
+    </div>
+    <div style="background: var(--surface2); border-radius: 10px; padding: 20px; border: 1px solid var(--border);">
+      <div style="font-size: 1.8rem; font-weight: 700; color: var(--accent2);">71</div>
+      <div style="font-size: 0.8rem; color: var(--muted); margin-top: 4px;">FACS shapekeys (face)</div>
+    </div>
+    <div style="background: var(--surface2); border-radius: 10px; padding: 20px; border: 1px solid var(--border);">
+      <div style="font-size: 1.8rem; font-weight: 700; color: var(--success);">114/116</div>
+      <div style="font-size: 0.8rem; color: var(--muted); margin-top: 4px;">FBX bones mapped to rig</div>
+    </div>
+    <div style="background: var(--surface2); border-radius: 10px; padding: 20px; border: 1px solid var(--border);">
+      <div style="font-size: 1.8rem; font-weight: 700; color: var(--success);">2.5s</div>
+      <div style="font-size: 0.8rem; color: var(--muted); margin-top: 4px;">Cycles CPU render (512²)</div>
+    </div>
+    <div style="background: var(--surface2); border-radius: 10px; padding: 20px; border: 1px solid var(--border);">
+      <div style="font-size: 1.8rem; font-weight: 700; color: var(--accent2);">145 GB</div>
+      <div style="font-size: 0.8rem; color: var(--muted); margin-top: 4px;">Archive on disk</div>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+    <div style="text-align: center;">
+      <img src="/dashboard/blender_cube_test.png" style="width: 100%; border-radius: 8px; border: 1px solid var(--border);" alt="Blender Cycles CPU cube test">
+      <div style="font-size: 0.8rem; color: var(--muted); margin-top: 6px;">Test 1: Minimal Cycles CPU render<br>512×512, 32 samples, 1.5s</div>
+    </div>
+    <div style="text-align: center;">
+      <img src="/dashboard/galtis_tpose.png" style="width: 100%; border-radius: 8px; border: 1px solid var(--border);" alt="Galtis rig T-pose">
+      <div style="font-size: 0.8rem; color: var(--muted); margin-top: 6px;">Test 2: Galtis rig T-pose<br>512×512, 64 samples, 2.5s</div>
+    </div>
+    <div style="text-align: center;">
+      <img src="/dashboard/galtis_anymore_sign.png" style="width: 100%; border-radius: 8px; border: 1px solid var(--border);" alt="Galtis Anymore sign animation">
+      <div style="font-size: 0.8rem; color: var(--muted); margin-top: 6px;">Test 3: FBX import — "Anymore" sign<br>512×512, 64 samples, 2.5s</div>
+    </div>
+  </div>
+
+  <div style="padding: 16px; background: var(--surface2); border-radius: 8px; border: 1px solid var(--border); font-size: 0.85rem; line-height: 1.8;">
+    <strong style="color: var(--accent2);">Pipeline Upgrade:</strong><br>
+    <span style="color: var(--muted);">2D MediaPipe keypoints + ffmpeg concat</span> → <span style="color: var(--success);">3D StudioGalt FBX → Blender retarget → NLA composition → Cycles render → video</span><br>
+    <strong style="color: var(--accent2);">Data:</strong> <span style="color: var(--muted);">StudioGalt Mocap Archive (CC0) — Xsens suits + StretchSense finger gloves, Blender/.fbx exports. 2,586 signs, 2023-05-12 → 2026-09-02.</span><br>
+    <strong style="color: var(--accent2);">Engine:</strong> <span style="color: var(--muted);">Blender 4.5.14 LTS · Cycles CPU (64 samples) · No GPU required — AMD Metal driver hang bypassed</span><br>
+    <strong style="color: var(--accent2);">Sign Index:</strong> <span style="color: var(--muted);">2.4MB JSON · 2,586 entries · 257 signs with multiple variants · 4 FBX variants per sign (Mesh, No Mesh Full, No Mesh Mini, No Mesh Mixamo)</span>
+  </div>
+</div>
+
 <!-- Sprint 4 Roadmap -->
 <div class="panel" style="margin-bottom: 24px;">
   <h2>🚀 Sprint 4 Roadmap — fal.ai Integration</h2>
@@ -533,7 +589,7 @@ footer { text-align: center; padding: 32px 0; color: var(--muted); font-size: 0.
 </div>
 
 <footer>
-  SignBridge POC · Built with Whisper, Ollama, MediaPipe, ffmpeg, fal.ai · ASLLVD Dataset (Boston University)
+  SignBridge · Sprint 5 · StudioGalt 3D Mocap + Blender Cycles CPU · CC0 License · Built with Whisper, Ollama, Blender, fal.ai
 </footer>
 
 </div>
