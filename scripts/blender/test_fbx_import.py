@@ -85,7 +85,9 @@ def setup_render(scene, meshes):
     bpy.ops.object.light_add(type="AREA", location=center + Vector((1.5 * span, -1.5 * span, 2 * span)))
     bpy.context.object.data.energy = 1600
     bpy.context.object.data.size = span
-    scene.render.engine = "BLENDER_EEVEE_NEXT"
+    scene.render.engine = "CYCLES"
+    scene.cycles.device = "CPU"
+    scene.cycles.samples = 64
     scene.render.resolution_x = 512
     scene.render.resolution_y = 512
     scene.render.resolution_percentage = 100

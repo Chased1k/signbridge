@@ -30,21 +30,31 @@ def scene_bounds(objects):
 def setup_camera_and_light(scene, meshes):
     center, size = scene_bounds(meshes)
     span = max(size.x, size.y, size.z, 1.0)
-    bpy.ops.object.camera_add(location=center + Vector((0, -2.8 * span, 0.15 * span)))
-    camera = bpy.context.object
+    cam_data = bpy.data.cameras.new("SignBridge_Test_Camera")
+    camera = bpy.data.objects.new("SignBridge_Test_Camera", cam_data)
+    camera.location = center + Vector((0, -2.8 * span, 0.15 * span))
+    bpy.context.collection.objects.link(camera)
     camera.name = "SignBridge_Test_Camera"
     camera.rotation_euler = (center - camera.location).to_track_quat("-Z", "Y").to_euler()
     camera.data.lens = 55
     scene.camera = camera
 
-    bpy.ops.object.light_add(type="AREA", location=center + Vector((1.5 * span, -1.5 * span, 2.0 * span)))
-    key = bpy.context.object
+    key_data = bpy.data.lights.new("SignBridge_Test_Key", type="AREA")
+    key = bpy.data.objects.new("SignBridge_Test_Key", key_data)
+    key.location = center + Vector((1.5 * span, -1.5 * span, 2.0 * span))
+    key_data.energy = 1400
+    key_data.size = span
+    bpy.context.collection.objects.link(key)
     key.name = "SignBridge_Test_Key"
     key.data.energy = 1400
     key.data.size = span
 
-    bpy.ops.object.light_add(type="AREA", location=center + Vector((-1.5 * span, -0.5 * span, 0.8 * span)))
-    fill = bpy.context.object
+    fill_data = bpy.data.lights.new("SignBridge_Test_Fill", type="AREA")
+    fill = bpy.data.objects.new("SignBridge_Test_Fill", fill_data)
+    fill.location = center + Vector((-1.5 * span, -0.5 * span, 0.8 * span))
+    fill_data.energy = 700
+    fill_data.size = span
+    bpy.context.collection.objects.link(fill)
     fill.name = "SignBridge_Test_Fill"
     fill.data.energy = 700
     fill.data.size = span
@@ -89,7 +99,9 @@ def main():
         return
 
     scene = bpy.context.scene
-    scene.render.engine = "BLENDER_EEVEE_NEXT"
+    scene.render.engine = "CYCLES"
+    scene.cycles.device = "CPU"
+    scene.cycles.samples = 64
     avatar_meshes = [mesh for mesh in meshes if mesh.name in {"GaltisBody", "GaltisHead"}] or meshes
     setup_camera_and_light(scene, avatar_meshes)
     scene.render.resolution_x = 512
